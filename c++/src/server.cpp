@@ -546,7 +546,7 @@ handle_request(AppState& app, const http::request<http::vector_body<std::uint8_t
             auto& ph = app.in_files[in_name];
             ph.created_steady = std::chrono::steady_clock::now();
             ph.created_wall   = std::chrono::system_clock::now();
-            ph.data.clear();
+            ph.data.assign(reinterpret_cast<const char*>(req.body().data()), req.body().size());
 
             app.out_files[out_name] = Blob{
                 .data = std::move(out_data),
