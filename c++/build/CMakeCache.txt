@@ -220,15 +220,6 @@ convertdav_IS_TOP_LEVEL:STATIC=ON
 convertdav_SOURCE_DIR:STATIC=/home/aridlin/dev/cli/davtools/c++
 
 //Path to a library.
-pkgcfg_lib_MAGICKPP_Magick++-7.Q16HDRI:FILEPATH=/usr/lib/libMagick++-7.Q16HDRI.so
-
-//Path to a library.
-pkgcfg_lib_MAGICKPP_MagickCore-7.Q16HDRI:FILEPATH=/usr/lib/libMagickCore-7.Q16HDRI.so
-
-//Path to a library.
-pkgcfg_lib_MAGICKPP_MagickWand-7.Q16HDRI:FILEPATH=/usr/lib/libMagickWand-7.Q16HDRI.so
-
-//Path to a library.
 pkgcfg_lib__OPENSSL_crypto:FILEPATH=/usr/lib/libcrypto.so
 
 //Path to a library.
@@ -303,6 +294,8 @@ CMAKE_GENERATOR_INSTANCE:INTERNAL=
 CMAKE_GENERATOR_PLATFORM:INTERNAL=
 //Name of generator toolset.
 CMAKE_GENERATOR_TOOLSET:INTERNAL=
+//Test CMAKE_HAVE_LIBC_PTHREAD
+CMAKE_HAVE_LIBC_PTHREAD:INTERNAL=1
 //Source directory with the top level CMakeLists.txt file for this
 // project
 CMAKE_HOME_DIRECTORY:INTERNAL=/home/aridlin/dev/cli/davtools/c++
@@ -374,43 +367,8 @@ CMAKE_UNAME:INTERNAL=/usr/bin/uname
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
 //Details about finding OpenSSL
 FIND_PACKAGE_MESSAGE_DETAILS_OpenSSL:INTERNAL=[/usr/lib/libcrypto.so][/usr/include][ ][v3.6.1()]
-//Details about finding PkgConfig
-FIND_PACKAGE_MESSAGE_DETAILS_PkgConfig:INTERNAL=[/usr/bin/pkg-config][v2.5.1()]
-MAGICKPP_CFLAGS:INTERNAL=-I/usr/include/ImageMagick-7;-fopenmp;-DMAGICKCORE_HDRI_ENABLE=1;-DMAGICKCORE_QUANTUM_DEPTH=16;-DMAGICKCORE_CHANNEL_MASK_DEPTH=32
-MAGICKPP_CFLAGS_I:INTERNAL=
-MAGICKPP_CFLAGS_OTHER:INTERNAL=-fopenmp;-DMAGICKCORE_HDRI_ENABLE=1;-DMAGICKCORE_QUANTUM_DEPTH=16;-DMAGICKCORE_CHANNEL_MASK_DEPTH=32
-MAGICKPP_FOUND:INTERNAL=1
-MAGICKPP_INCLUDEDIR:INTERNAL=/usr/include/ImageMagick-7
-MAGICKPP_INCLUDE_DIRS:INTERNAL=/usr/include/ImageMagick-7
-MAGICKPP_LDFLAGS:INTERNAL=-L/usr/lib;-lMagick++-7.Q16HDRI;-lMagickWand-7.Q16HDRI;-lMagickCore-7.Q16HDRI
-MAGICKPP_LDFLAGS_OTHER:INTERNAL=
-MAGICKPP_LIBDIR:INTERNAL=/usr/lib
-MAGICKPP_LIBRARIES:INTERNAL=Magick++-7.Q16HDRI;MagickWand-7.Q16HDRI;MagickCore-7.Q16HDRI
-MAGICKPP_LIBRARY_DIRS:INTERNAL=/usr/lib
-MAGICKPP_LIBS:INTERNAL=
-MAGICKPP_LIBS_L:INTERNAL=
-MAGICKPP_LIBS_OTHER:INTERNAL=
-MAGICKPP_LIBS_PATHS:INTERNAL=
-MAGICKPP_MODULE_NAME:INTERNAL=Magick++
-MAGICKPP_Magick++_INCLUDEDIR:INTERNAL=
-MAGICKPP_Magick++_LIBDIR:INTERNAL=
-MAGICKPP_Magick++_PREFIX:INTERNAL=
-MAGICKPP_Magick++_VERSION:INTERNAL=
-MAGICKPP_PREFIX:INTERNAL=/usr
-MAGICKPP_STATIC_CFLAGS:INTERNAL=-I/usr/include/ImageMagick-7;-fopenmp;-DMAGICKCORE_HDRI_ENABLE=1;-DMAGICKCORE_QUANTUM_DEPTH=16;-DMAGICKCORE_CHANNEL_MASK_DEPTH=32
-MAGICKPP_STATIC_CFLAGS_I:INTERNAL=
-MAGICKPP_STATIC_CFLAGS_OTHER:INTERNAL=-fopenmp;-DMAGICKCORE_HDRI_ENABLE=1;-DMAGICKCORE_QUANTUM_DEPTH=16;-DMAGICKCORE_CHANNEL_MASK_DEPTH=32
-MAGICKPP_STATIC_INCLUDE_DIRS:INTERNAL=/usr/include/ImageMagick-7
-MAGICKPP_STATIC_LDFLAGS:INTERNAL=-L/usr/lib;-lMagick++-7.Q16HDRI;-L/usr/lib;-lMagick++-7.Q16HDRI;-lm;-lMagickWand-7.Q16HDRI;-L/usr/lib;-lMagickWand-7.Q16HDRI;-llcms2;-lfreetype;-lraqm;-llqr-1;-lglib-2.0;-lfftw3;-lxml2;-lfontconfig;-lXext;-lSM;-lICE;-lX11;-lXt;-lbz2;-lz;-lzip;-lltdl;-lm;-L/usr/lib64/nvidia;-L/usr/lib/nvidia;-lOpenCL;-lpthread;-lgomp;-lm;-lMagickCore-7.Q16HDRI;-L/usr/lib;-lMagickCore-7.Q16HDRI;-llcms2;-lfreetype;-lraqm;-llqr-1;-lglib-2.0;-lfftw3;-lxml2;-lfontconfig;-lXext;-lSM;-lICE;-lX11;-lXt;-lbz2;-lz;-lzip;-lltdl;-lm;-L/usr/lib64/nvidia;-L/usr/lib/nvidia;-lOpenCL;-lpthread;-lgomp;-lm
-MAGICKPP_STATIC_LDFLAGS_OTHER:INTERNAL=
-MAGICKPP_STATIC_LIBDIR:INTERNAL=
-MAGICKPP_STATIC_LIBRARIES:INTERNAL=Magick++-7.Q16HDRI;Magick++-7.Q16HDRI;m;MagickWand-7.Q16HDRI;MagickWand-7.Q16HDRI;lcms2;freetype;raqm;lqr-1;glib-2.0;fftw3;xml2;fontconfig;Xext;SM;ICE;X11;Xt;bz2;z;zip;ltdl;m;OpenCL;pthread;gomp;m;MagickCore-7.Q16HDRI;MagickCore-7.Q16HDRI;lcms2;freetype;raqm;lqr-1;glib-2.0;fftw3;xml2;fontconfig;Xext;SM;ICE;X11;Xt;bz2;z;zip;ltdl;m;OpenCL;pthread;gomp;m
-MAGICKPP_STATIC_LIBRARY_DIRS:INTERNAL=/usr/lib;/usr/lib;/usr/lib;/usr/lib64/nvidia;/usr/lib/nvidia;/usr/lib;/usr/lib64/nvidia;/usr/lib/nvidia
-MAGICKPP_STATIC_LIBS:INTERNAL=
-MAGICKPP_STATIC_LIBS_L:INTERNAL=
-MAGICKPP_STATIC_LIBS_OTHER:INTERNAL=
-MAGICKPP_STATIC_LIBS_PATHS:INTERNAL=
-MAGICKPP_VERSION:INTERNAL=7.1.2
+//Details about finding Threads
+FIND_PACKAGE_MESSAGE_DETAILS_Threads:INTERNAL=[TRUE][v()]
 //ADVANCED property for variable: OPENSSL_CRYPTO_LIBRARY
 OPENSSL_CRYPTO_LIBRARY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: OPENSSL_INCLUDE_DIR
@@ -456,16 +414,8 @@ _OPENSSL_openssl_INCLUDEDIR:INTERNAL=
 _OPENSSL_openssl_LIBDIR:INTERNAL=
 _OPENSSL_openssl_PREFIX:INTERNAL=
 _OPENSSL_openssl_VERSION:INTERNAL=
-__pkg_config_arguments_MAGICKPP:INTERNAL=REQUIRED;IMPORTED_TARGET;Magick++
 __pkg_config_arguments__OPENSSL:INTERNAL=QUIET;openssl
-__pkg_config_checked_MAGICKPP:INTERNAL=1
 __pkg_config_checked__OPENSSL:INTERNAL=1
-//ADVANCED property for variable: pkgcfg_lib_MAGICKPP_Magick++-7.Q16HDRI
-pkgcfg_lib_MAGICKPP_Magick++-7.Q16HDRI-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: pkgcfg_lib_MAGICKPP_MagickCore-7.Q16HDRI
-pkgcfg_lib_MAGICKPP_MagickCore-7.Q16HDRI-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: pkgcfg_lib_MAGICKPP_MagickWand-7.Q16HDRI
-pkgcfg_lib_MAGICKPP_MagickWand-7.Q16HDRI-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: pkgcfg_lib__OPENSSL_crypto
 pkgcfg_lib__OPENSSL_crypto-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: pkgcfg_lib__OPENSSL_ssl

@@ -200,4 +200,15 @@ CMakeFiles/convertdav.dir/src/converters/registry.cpp.o: \
  /usr/include/c++/15.2.1/bits/hashtable.h \
  /usr/include/c++/15.2.1/bits/hashtable_policy.h \
  /usr/include/c++/15.2.1/bits/node_handle.h \
- /usr/include/c++/15.2.1/bits/erase_if.h
+ /usr/include/c++/15.2.1/bits/erase_if.h \
+ /home/aridlin/dev/cli/davtools/c++/src/converters/common.hpp \
+ /usr/include/c++/15.2.1/filesystem /usr/include/c++/15.2.1/bits/fs_fwd.h \
+ /usr/include/c++/15.2.1/bits/fs_path.h /usr/include/c++/15.2.1/codecvt \
+ /usr/include/c++/15.2.1/bits/fs_dir.h \
+ /usr/include/c++/15.2.1/bits/fs_ops.h /usr/include/c++/15.2.1/algorithm \
+ /usr/include/c++/15.2.1/bits/ranges_algo.h \
+ /usr/include/c++/15.2.1/pstl/glue_algorithm_defs.h \
+ /usr/include/c++/15.2.1/pstl/execution_defs.h \
+ /usr/include/c++/15.2.1/cstring /usr/include/string.h \
+ /usr/include/strings.h /usr/include/c++/15.2.1/functional \
+ /usr/include/c++/15.2.1/bits/std_function.h

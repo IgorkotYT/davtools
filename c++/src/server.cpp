@@ -24,11 +24,12 @@ using tcp = asio::ip::tcp;
 static constexpr std::string_view kTop = "/convert";
 
 // Add new converter names here when you add files to the registry.
-static const std::array<std::string_view, 4> kConverters = {
+static const std::array<std::string_view, 5> kConverters = {
     "png-jpg",
     "invert",
     "img-gif",
-    "pdf-png"
+    "pdf-png",
+    "mp4-gif"
 };
 
 struct ParsedConvertPath {

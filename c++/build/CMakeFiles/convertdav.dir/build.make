@@ -100,10 +100,24 @@ CMakeFiles/convertdav.dir/src/server.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/convertdav.dir/src/server.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/aridlin/dev/cli/davtools/c++/src/server.cpp -o CMakeFiles/convertdav.dir/src/server.cpp.s
 
+CMakeFiles/convertdav.dir/src/converters/common.cpp.o: CMakeFiles/convertdav.dir/flags.make
+CMakeFiles/convertdav.dir/src/converters/common.cpp.o: /home/aridlin/dev/cli/davtools/c++/src/converters/common.cpp
+CMakeFiles/convertdav.dir/src/converters/common.cpp.o: CMakeFiles/convertdav.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/aridlin/dev/cli/davtools/c++/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/convertdav.dir/src/converters/common.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/convertdav.dir/src/converters/common.cpp.o -MF CMakeFiles/convertdav.dir/src/converters/common.cpp.o.d -o CMakeFiles/convertdav.dir/src/converters/common.cpp.o -c /home/aridlin/dev/cli/davtools/c++/src/converters/common.cpp
+
+CMakeFiles/convertdav.dir/src/converters/common.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/convertdav.dir/src/converters/common.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/aridlin/dev/cli/davtools/c++/src/converters/common.cpp > CMakeFiles/convertdav.dir/src/converters/common.cpp.i
+
+CMakeFiles/convertdav.dir/src/converters/common.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/convertdav.dir/src/converters/common.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/aridlin/dev/cli/davtools/c++/src/converters/common.cpp -o CMakeFiles/convertdav.dir/src/converters/common.cpp.s
+
 CMakeFiles/convertdav.dir/src/converters/registry.cpp.o: CMakeFiles/convertdav.dir/flags.make
 CMakeFiles/convertdav.dir/src/converters/registry.cpp.o: /home/aridlin/dev/cli/davtools/c++/src/converters/registry.cpp
 CMakeFiles/convertdav.dir/src/converters/registry.cpp.o: CMakeFiles/convertdav.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/aridlin/dev/cli/davtools/c++/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/convertdav.dir/src/converters/registry.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/aridlin/dev/cli/davtools/c++/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/convertdav.dir/src/converters/registry.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/convertdav.dir/src/converters/registry.cpp.o -MF CMakeFiles/convertdav.dir/src/converters/registry.cpp.o.d -o CMakeFiles/convertdav.dir/src/converters/registry.cpp.o -c /home/aridlin/dev/cli/davtools/c++/src/converters/registry.cpp
 
 CMakeFiles/convertdav.dir/src/converters/registry.cpp.i: cmake_force
@@ -117,7 +131,7 @@ CMakeFiles/convertdav.dir/src/converters/registry.cpp.s: cmake_force
 CMakeFiles/convertdav.dir/src/converters/png_jpg.cpp.o: CMakeFiles/convertdav.dir/flags.make
 CMakeFiles/convertdav.dir/src/converters/png_jpg.cpp.o: /home/aridlin/dev/cli/davtools/c++/src/converters/png_jpg.cpp
 CMakeFiles/convertdav.dir/src/converters/png_jpg.cpp.o: CMakeFiles/convertdav.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/aridlin/dev/cli/davtools/c++/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/convertdav.dir/src/converters/png_jpg.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/aridlin/dev/cli/davtools/c++/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/convertdav.dir/src/converters/png_jpg.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/convertdav.dir/src/converters/png_jpg.cpp.o -MF CMakeFiles/convertdav.dir/src/converters/png_jpg.cpp.o.d -o CMakeFiles/convertdav.dir/src/converters/png_jpg.cpp.o -c /home/aridlin/dev/cli/davtools/c++/src/converters/png_jpg.cpp
 
 CMakeFiles/convertdav.dir/src/converters/png_jpg.cpp.i: cmake_force
@@ -131,7 +145,7 @@ CMakeFiles/convertdav.dir/src/converters/png_jpg.cpp.s: cmake_force
 CMakeFiles/convertdav.dir/src/converters/invert.cpp.o: CMakeFiles/convertdav.dir/flags.make
 CMakeFiles/convertdav.dir/src/converters/invert.cpp.o: /home/aridlin/dev/cli/davtools/c++/src/converters/invert.cpp
 CMakeFiles/convertdav.dir/src/converters/invert.cpp.o: CMakeFiles/convertdav.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/aridlin/dev/cli/davtools/c++/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/convertdav.dir/src/converters/invert.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/aridlin/dev/cli/davtools/c++/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/convertdav.dir/src/converters/invert.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/convertdav.dir/src/converters/invert.cpp.o -MF CMakeFiles/convertdav.dir/src/converters/invert.cpp.o.d -o CMakeFiles/convertdav.dir/src/converters/invert.cpp.o -c /home/aridlin/dev/cli/davtools/c++/src/converters/invert.cpp
 
 CMakeFiles/convertdav.dir/src/converters/invert.cpp.i: cmake_force
@@ -145,7 +159,7 @@ CMakeFiles/convertdav.dir/src/converters/invert.cpp.s: cmake_force
 CMakeFiles/convertdav.dir/src/converters/img_gif.cpp.o: CMakeFiles/convertdav.dir/flags.make
 CMakeFiles/convertdav.dir/src/converters/img_gif.cpp.o: /home/aridlin/dev/cli/davtools/c++/src/converters/img_gif.cpp
 CMakeFiles/convertdav.dir/src/converters/img_gif.cpp.o: CMakeFiles/convertdav.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/aridlin/dev/cli/davtools/c++/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/convertdav.dir/src/converters/img_gif.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/aridlin/dev/cli/davtools/c++/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/convertdav.dir/src/converters/img_gif.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/convertdav.dir/src/converters/img_gif.cpp.o -MF CMakeFiles/convertdav.dir/src/converters/img_gif.cpp.o.d -o CMakeFiles/convertdav.dir/src/converters/img_gif.cpp.o -c /home/aridlin/dev/cli/davtools/c++/src/converters/img_gif.cpp
 
 CMakeFiles/convertdav.dir/src/converters/img_gif.cpp.i: cmake_force
@@ -159,7 +173,7 @@ CMakeFiles/convertdav.dir/src/converters/img_gif.cpp.s: cmake_force
 CMakeFiles/convertdav.dir/src/converters/pdf_png.cpp.o: CMakeFiles/convertdav.dir/flags.make
 CMakeFiles/convertdav.dir/src/converters/pdf_png.cpp.o: /home/aridlin/dev/cli/davtools/c++/src/converters/pdf_png.cpp
 CMakeFiles/convertdav.dir/src/converters/pdf_png.cpp.o: CMakeFiles/convertdav.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/aridlin/dev/cli/davtools/c++/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/convertdav.dir/src/converters/pdf_png.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/aridlin/dev/cli/davtools/c++/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/convertdav.dir/src/converters/pdf_png.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/convertdav.dir/src/converters/pdf_png.cpp.o -MF CMakeFiles/convertdav.dir/src/converters/pdf_png.cpp.o.d -o CMakeFiles/convertdav.dir/src/converters/pdf_png.cpp.o -c /home/aridlin/dev/cli/davtools/c++/src/converters/pdf_png.cpp
 
 CMakeFiles/convertdav.dir/src/converters/pdf_png.cpp.i: cmake_force
@@ -170,35 +184,50 @@ CMakeFiles/convertdav.dir/src/converters/pdf_png.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/convertdav.dir/src/converters/pdf_png.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/aridlin/dev/cli/davtools/c++/src/converters/pdf_png.cpp -o CMakeFiles/convertdav.dir/src/converters/pdf_png.cpp.s
 
+CMakeFiles/convertdav.dir/src/converters/mp4_gif.cpp.o: CMakeFiles/convertdav.dir/flags.make
+CMakeFiles/convertdav.dir/src/converters/mp4_gif.cpp.o: /home/aridlin/dev/cli/davtools/c++/src/converters/mp4_gif.cpp
+CMakeFiles/convertdav.dir/src/converters/mp4_gif.cpp.o: CMakeFiles/convertdav.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/aridlin/dev/cli/davtools/c++/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/convertdav.dir/src/converters/mp4_gif.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/convertdav.dir/src/converters/mp4_gif.cpp.o -MF CMakeFiles/convertdav.dir/src/converters/mp4_gif.cpp.o.d -o CMakeFiles/convertdav.dir/src/converters/mp4_gif.cpp.o -c /home/aridlin/dev/cli/davtools/c++/src/converters/mp4_gif.cpp
+
+CMakeFiles/convertdav.dir/src/converters/mp4_gif.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/convertdav.dir/src/converters/mp4_gif.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/aridlin/dev/cli/davtools/c++/src/converters/mp4_gif.cpp > CMakeFiles/convertdav.dir/src/converters/mp4_gif.cpp.i
+
+CMakeFiles/convertdav.dir/src/converters/mp4_gif.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/convertdav.dir/src/converters/mp4_gif.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/aridlin/dev/cli/davtools/c++/src/converters/mp4_gif.cpp -o CMakeFiles/convertdav.dir/src/converters/mp4_gif.cpp.s
+
 # Object files for target convertdav
 convertdav_OBJECTS = \
 "CMakeFiles/convertdav.dir/src/main.cpp.o" \
 "CMakeFiles/convertdav.dir/src/server.cpp.o" \
+"CMakeFiles/convertdav.dir/src/converters/common.cpp.o" \
 "CMakeFiles/convertdav.dir/src/converters/registry.cpp.o" \
 "CMakeFiles/convertdav.dir/src/converters/png_jpg.cpp.o" \
 "CMakeFiles/convertdav.dir/src/converters/invert.cpp.o" \
 "CMakeFiles/convertdav.dir/src/converters/img_gif.cpp.o" \
-"CMakeFiles/convertdav.dir/src/converters/pdf_png.cpp.o"
+"CMakeFiles/convertdav.dir/src/converters/pdf_png.cpp.o" \
+"CMakeFiles/convertdav.dir/src/converters/mp4_gif.cpp.o"
 
 # External object files for target convertdav
 convertdav_EXTERNAL_OBJECTS =
 
 convertdav: CMakeFiles/convertdav.dir/src/main.cpp.o
 convertdav: CMakeFiles/convertdav.dir/src/server.cpp.o
+convertdav: CMakeFiles/convertdav.dir/src/converters/common.cpp.o
 convertdav: CMakeFiles/convertdav.dir/src/converters/registry.cpp.o
 convertdav: CMakeFiles/convertdav.dir/src/converters/png_jpg.cpp.o
 convertdav: CMakeFiles/convertdav.dir/src/converters/invert.cpp.o
 convertdav: CMakeFiles/convertdav.dir/src/converters/img_gif.cpp.o
 convertdav: CMakeFiles/convertdav.dir/src/converters/pdf_png.cpp.o
+convertdav: CMakeFiles/convertdav.dir/src/converters/mp4_gif.cpp.o
 convertdav: CMakeFiles/convertdav.dir/build.make
 convertdav: CMakeFiles/convertdav.dir/compiler_depend.ts
 convertdav: /usr/lib/libssl.so
 convertdav: /usr/lib/libcrypto.so
-convertdav: /usr/lib/libMagick++-7.Q16HDRI.so
-convertdav: /usr/lib/libMagickWand-7.Q16HDRI.so
-convertdav: /usr/lib/libMagickCore-7.Q16HDRI.so
 convertdav: CMakeFiles/convertdav.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/aridlin/dev/cli/davtools/c++/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Linking CXX executable convertdav"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/aridlin/dev/cli/davtools/c++/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Linking CXX executable convertdav"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/convertdav.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

@@ -1,5 +1,5 @@
-CMakeFiles/convertdav.dir/src/converters/png_jpg.cpp.o: \
- /home/aridlin/dev/cli/davtools/c++/src/converters/png_jpg.cpp \
+CMakeFiles/convertdav.dir/src/converters/mp4_gif.cpp.o: \
+ /home/aridlin/dev/cli/davtools/c++/src/converters/mp4_gif.cpp \
  /usr/include/stdc-predef.h \
  /home/aridlin/dev/cli/davtools/c++/src/converters/common.hpp \
  /home/aridlin/dev/cli/davtools/c++/src/converters/../app.hpp \

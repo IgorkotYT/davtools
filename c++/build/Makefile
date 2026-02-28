@@ -129,6 +129,30 @@ convertdav/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/convertdav.dir/build.make CMakeFiles/convertdav.dir/build
 .PHONY : convertdav/fast
 
+src/converters/common.o: src/converters/common.cpp.o
+.PHONY : src/converters/common.o
+
+# target to build an object file
+src/converters/common.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/convertdav.dir/build.make CMakeFiles/convertdav.dir/src/converters/common.cpp.o
+.PHONY : src/converters/common.cpp.o
+
+src/converters/common.i: src/converters/common.cpp.i
+.PHONY : src/converters/common.i
+
+# target to preprocess a source file
+src/converters/common.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/convertdav.dir/build.make CMakeFiles/convertdav.dir/src/converters/common.cpp.i
+.PHONY : src/converters/common.cpp.i
+
+src/converters/common.s: src/converters/common.cpp.s
+.PHONY : src/converters/common.s
+
+# target to generate assembly for a file
+src/converters/common.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/convertdav.dir/build.make CMakeFiles/convertdav.dir/src/converters/common.cpp.s
+.PHONY : src/converters/common.cpp.s
+
 src/converters/img_gif.o: src/converters/img_gif.cpp.o
 .PHONY : src/converters/img_gif.o
 
@@ -176,6 +200,30 @@ src/converters/invert.s: src/converters/invert.cpp.s
 src/converters/invert.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/convertdav.dir/build.make CMakeFiles/convertdav.dir/src/converters/invert.cpp.s
 .PHONY : src/converters/invert.cpp.s
+
+src/converters/mp4_gif.o: src/converters/mp4_gif.cpp.o
+.PHONY : src/converters/mp4_gif.o
+
+# target to build an object file
+src/converters/mp4_gif.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/convertdav.dir/build.make CMakeFiles/convertdav.dir/src/converters/mp4_gif.cpp.o
+.PHONY : src/converters/mp4_gif.cpp.o
+
+src/converters/mp4_gif.i: src/converters/mp4_gif.cpp.i
+.PHONY : src/converters/mp4_gif.i
+
+# target to preprocess a source file
+src/converters/mp4_gif.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/convertdav.dir/build.make CMakeFiles/convertdav.dir/src/converters/mp4_gif.cpp.i
+.PHONY : src/converters/mp4_gif.cpp.i
+
+src/converters/mp4_gif.s: src/converters/mp4_gif.cpp.s
+.PHONY : src/converters/mp4_gif.s
+
+# target to generate assembly for a file
+src/converters/mp4_gif.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/convertdav.dir/build.make CMakeFiles/convertdav.dir/src/converters/mp4_gif.cpp.s
+.PHONY : src/converters/mp4_gif.cpp.s
 
 src/converters/pdf_png.o: src/converters/pdf_png.cpp.o
 .PHONY : src/converters/pdf_png.o
@@ -306,12 +354,18 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... convertdav"
+	@echo "... src/converters/common.o"
+	@echo "... src/converters/common.i"
+	@echo "... src/converters/common.s"
 	@echo "... src/converters/img_gif.o"
 	@echo "... src/converters/img_gif.i"
 	@echo "... src/converters/img_gif.s"
 	@echo "... src/converters/invert.o"
 	@echo "... src/converters/invert.i"
 	@echo "... src/converters/invert.s"
+	@echo "... src/converters/mp4_gif.o"
+	@echo "... src/converters/mp4_gif.i"
+	@echo "... src/converters/mp4_gif.s"
 	@echo "... src/converters/pdf_png.o"
 	@echo "... src/converters/pdf_png.i"
 	@echo "... src/converters/pdf_png.s"
