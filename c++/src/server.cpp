@@ -159,8 +159,6 @@ static void append_dav_collection_response(std::ostringstream& x,
       << "</D:response>";
 }
 
-
-
 static void append_dav_file_response(std::ostringstream& x,
                                      std::string_view href,
                                      std::string_view name,
@@ -179,6 +177,18 @@ static void append_dav_file_response(std::ostringstream& x,
       << "<D:status>HTTP/1.1 200 OK</D:status>"
       << "</D:propstat>"
       << "</D:response>";
+}
+
+static std::string dav_multistatus_for_single_file(std::string_view href,
+                                                   std::string_view name,
+                                                   const Blob& blob)
+{
+    std::ostringstream x;
+    x << R"(<?xml version="1.0" encoding="utf-8"?>)"
+      << R"(<D:multistatus xmlns:D="DAV:">)";
+    append_dav_file_response(x, href, name, blob);
+    x << "</D:multistatus>";
+    return x.str();
 }
 
 static std::string dav_multistatus_for_convert(const AppState& state,
@@ -220,14 +230,24 @@ static std::string dav_multistatus_for_root(const AppState& state,
     return x.str();
 }
 
-
 static std::string dav_multistatus_for_in(const AppState& state, bool include_children) {
-    (void)include_children; // no children exposed in /in for now
     std::ostringstream x;
     x << R"(<?xml version="1.0" encoding="utf-8"?>)"
       << R"(<D:multistatus xmlns:D="DAV:">)";
 
     append_dav_collection_response(x, "/convert/png-jpg/in/", "in", state.server_started_wall);
+
+    // Optional: include placeholders if Explorer asks Depth:1
+    if (include_children) {
+        for (const auto& [name, blob] : state.in_files) {
+            append_dav_file_response(
+                x,
+                std::string("/convert/png-jpg/in/") + name,
+                name,
+                blob
+            );
+        }
+    }
 
     x << "</D:multistatus>";
     return x.str();
@@ -259,7 +279,7 @@ static http::response<http::string_body>
 make_response(http::status st, std::string body = "", std::string content_type = "text/plain; charset=utf-8")
 {
     http::response<http::string_body> res{st, 11};
-    res.set(http::field::server, "convertdav/0.3");
+    res.set(http::field::server, "convertdav/0.4");
     if (!content_type.empty()) res.set(http::field::content_type, content_type);
     res.body() = std::move(body);
     res.prepare_payload();
@@ -324,18 +344,19 @@ handle_request(AppState& app, const http::request<http::vector_body<std::uint8_t
         const bool include_children = (depth >= 1);
 
         if (t == std::string(kTop)) {
-          return make_response(
-              static_cast<http::status>(207),
-              dav_multistatus_for_convert(app, include_children, target), // <- pass target
-              "text/xml; charset=utf-8"
-              );
+            return make_response(
+                static_cast<http::status>(207),
+                dav_multistatus_for_convert(app, include_children, target),
+                "text/xml; charset=utf-8"
+            );
         }
+
         if (t == std::string(kBase)) {
-          return make_response(
-              static_cast<http::status>(207),
-              dav_multistatus_for_root(app, include_children, target), // <- pass target
-              "text/xml; charset=utf-8"
-              );
+            return make_response(
+                static_cast<http::status>(207),
+                dav_multistatus_for_root(app, include_children, target),
+                "text/xml; charset=utf-8"
+            );
         }
 
         if (t == std::string(kBase) + "/out") {
@@ -348,11 +369,46 @@ handle_request(AppState& app, const http::request<http::vector_body<std::uint8_t
         }
 
         if (t == std::string(kBase) + "/in") {
+            std::scoped_lock lock(app.mtx);
             return make_response(
                 static_cast<http::status>(207),
                 dav_multistatus_for_in(app, include_children),
                 "text/xml; charset=utf-8"
             );
+        }
+
+        // PROPFIND for file under /in/
+        if (starts_with(t, std::string(kBase) + "/in/")) {
+            std::string name = t.substr(std::string(kBase).size() + 4); // "/in/"
+            if (!name.empty()) {
+                std::scoped_lock lock(app.mtx);
+                auto it = app.in_files.find(name);
+                if (it != app.in_files.end()) {
+                    return make_response(
+                        static_cast<http::status>(207),
+                        dav_multistatus_for_single_file(target, name, it->second),
+                        "text/xml; charset=utf-8"
+                    );
+                }
+            }
+            return make_response(http::status::not_found, "PROPFIND target not found\n");
+        }
+
+        // PROPFIND for file under /out/
+        if (starts_with(t, std::string(kBase) + "/out/")) {
+            std::string name = t.substr(std::string(kBase).size() + 5); // "/out/"
+            if (!name.empty()) {
+                std::scoped_lock lock(app.mtx);
+                auto it = app.out_files.find(name);
+                if (it != app.out_files.end()) {
+                    return make_response(
+                        static_cast<http::status>(207),
+                        dav_multistatus_for_single_file(target, name, it->second),
+                        "text/xml; charset=utf-8"
+                    );
+                }
+            }
+            return make_response(http::status::not_found, "PROPFIND target not found\n");
         }
 
         if (t == "/") {
@@ -371,24 +427,49 @@ handle_request(AppState& app, const http::request<http::vector_body<std::uint8_t
     }
 
     if (req.method() == http::verb::get || req.method() == http::verb::head) {
+        // GET/HEAD for placeholder files under /in/
+        if (starts_with(target, std::string(kBase) + "/in/")) {
+            std::string name = target.substr(std::string(kBase).size() + 4); // "/in/"
+            if (!name.empty()) {
+                std::scoped_lock lock(app.mtx);
+                auto it = app.in_files.find(name);
+                if (it == app.in_files.end()) {
+                    return make_response(http::status::not_found, "No such input placeholder\n");
+                }
+
+                auto res = make_response(
+                    http::status::ok,
+                    (req.method() == http::verb::head) ? "" : it->second.data,
+                    "application/octet-stream"
+                );
+                if (req.method() == http::verb::head) {
+                    res.content_length(it->second.data.size());
+                }
+                return res;
+            }
+            // empty name => this is the /in/ collection path; fall through to sanity paths below
+        }
+
+        // GET/HEAD for files under /out/
         if (starts_with(target, std::string(kBase) + "/out/")) {
             std::string name = target.substr(std::string(kBase).size() + 5); // "/out/"
-            if (name.empty()) return make_response(http::status::bad_request, "Missing filename\n");
+            if (!name.empty()) {
+                std::scoped_lock lock(app.mtx);
+                auto it = app.out_files.find(name);
+                if (it == app.out_files.end()) return make_response(http::status::not_found, "No such converted file\n");
 
-            std::scoped_lock lock(app.mtx);
-            auto it = app.out_files.find(name);
-            if (it == app.out_files.end()) return make_response(http::status::not_found, "No such converted file\n");
-
-            std::string ct = guess_content_type_from_name(name);
-            auto res = make_response(
-                http::status::ok,
-                (req.method() == http::verb::head) ? "" : it->second.data,
-                ct
-            );
-            if (req.method() == http::verb::head) {
-                res.content_length(it->second.data.size());
+                std::string ct = guess_content_type_from_name(name);
+                auto res = make_response(
+                    http::status::ok,
+                    (req.method() == http::verb::head) ? "" : it->second.data,
+                    ct
+                );
+                if (req.method() == http::verb::head) {
+                    res.content_length(it->second.data.size());
+                }
+                return res;
             }
-            return res;
+            // empty name => this is the /out/ collection path; fall through
         }
 
         if (target == "/" || target == "/index.html") {
@@ -431,6 +512,22 @@ handle_request(AppState& app, const http::request<http::vector_body<std::uint8_t
             return make_response(http::status::payload_too_large, "File too large\n");
         }
 
+        // Always create/refresh placeholder in /in
+        {
+            std::scoped_lock lock(app.mtx);
+            auto& ph = app.in_files[in_name];
+            ph.created_steady = std::chrono::steady_clock::now();
+            ph.created_wall   = std::chrono::system_clock::now();
+            ph.data.clear(); // keep placeholders tiny
+        }
+
+        // Explorer often sends zero-byte PUT first as a create step.
+        // Accept it and do not convert yet.
+        if (req.body().empty()) {
+            return make_response(http::status::created, "", "");
+        }
+
+        // Real upload => convert immediately
         std::string out_name = replace_ext_to_jpg(in_name);
         std::string out_data;
         try {
@@ -444,6 +541,13 @@ handle_request(AppState& app, const http::request<http::vector_body<std::uint8_t
 
         {
             std::scoped_lock lock(app.mtx);
+
+            // refresh placeholder timestamp
+            auto& ph = app.in_files[in_name];
+            ph.created_steady = std::chrono::steady_clock::now();
+            ph.created_wall   = std::chrono::system_clock::now();
+            ph.data.clear();
+
             app.out_files[out_name] = Blob{
                 .data = std::move(out_data),
                 .created_steady = std::chrono::steady_clock::now(),
@@ -451,8 +555,8 @@ handle_request(AppState& app, const http::request<http::vector_body<std::uint8_t
             };
         }
 
-        return make_response(http::status::created,
-            "Converted (magicock) -> /convert/png-jpg/out/" + out_name + "\n");
+        // Empty success response tends to play nicer with WebDAV clients
+        return make_response(http::status::created, "", "");
     }
 
     if (method == "MKCOL") {
@@ -558,7 +662,6 @@ static void do_session(tcp::socket socket, AppState& app) {
     socket.shutdown(tcp::socket::shutdown_send, ec);
 }
 
-
 void run_server(const std::string& bind_ip, unsigned short port) {
     const auto address = asio::ip::make_address(bind_ip);
 
@@ -574,6 +677,12 @@ void run_server(const std::string& bind_ip, unsigned short port) {
             std::this_thread::sleep_for(30s);
             std::scoped_lock lock(app.mtx);
             auto now = std::chrono::steady_clock::now();
+
+            for (auto it = app.in_files.begin(); it != app.in_files.end();) {
+                if (now - it->second.created_steady > TTL) it = app.in_files.erase(it);
+                else ++it;
+            }
+
             for (auto it = app.out_files.begin(); it != app.out_files.end();) {
                 if (now - it->second.created_steady > TTL) it = app.out_files.erase(it);
                 else ++it;
@@ -585,11 +694,11 @@ void run_server(const std::string& bind_ip, unsigned short port) {
     std::cout << "WebDAV base: /convert/png-jpg/\n";
 
     for (;;) {
-      tcp::socket socket{ioc};
-      acceptor.accept(socket);
+        tcp::socket socket{ioc};
+        acceptor.accept(socket);
 
-      std::thread([s = std::move(socket), &app]() mutable {
-          do_session(std::move(s), app);
-          }).detach();
+        std::thread([s = std::move(socket), &app]() mutable {
+            do_session(std::move(s), app);
+        }).detach();
     }
 }

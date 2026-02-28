@@ -15,7 +15,8 @@ struct Blob {
 
 struct AppState {
     std::mutex mtx;
-    std::unordered_map<std::string, Blob> out_files; // key = output filename
+    std::unordered_map<std::string, Blob> in_files;
+    std::unordered_map<std::string, Blob> out_files;
     std::chrono::system_clock::time_point server_started_wall = std::chrono::system_clock::now();
 };
 
