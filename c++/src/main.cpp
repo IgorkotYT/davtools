@@ -11,7 +11,7 @@ int main(int argc, char** argv) {
 
         const std::string bind_ip = (argc > 1) ? argv[1] : "0.0.0.0";
         const unsigned short port = static_cast<unsigned short>(
-            (argc > 2) ? std::stoi(argv[2]) : 8080
+            (argc > 2) ? std::stoi(argv[2]) : 8137
         );
 
         run_server(bind_ip, port);

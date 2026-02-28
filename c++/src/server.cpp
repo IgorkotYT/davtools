@@ -383,6 +383,27 @@ make_lock_response(std::string_view href)
 }
 
 static http::response<http::string_body>
+make_proppatch_response(std::string_view href)
+{
+    // Minimal "accepted" PROPPATCH response.
+    // We intentionally do not persist dead properties yet.
+    std::ostringstream body;
+    body << R"(<?xml version="1.0" encoding="utf-8"?>)"
+         << R"(<D:multistatus xmlns:D="DAV:">)"
+         << R"(<D:response>)"
+         << R"(<D:href>)" << xml_escape(href) << R"(</D:href>)"
+         << R"(<D:propstat>)"
+         << R"(<D:prop/>)"
+         << R"(<D:status>HTTP/1.1 200 OK</D:status>)"
+         << R"(</D:propstat>)"
+         << R"(</D:response>)"
+         << R"(</D:multistatus>)";
+
+    return make_response(static_cast<http::status>(207), body.str(), "text/xml; charset=utf-8");
+}
+
+
+static http::response<http::string_body>
 handle_request(AppState& app,
                const std::string& client_ip,
                const http::request<http::vector_body<std::uint8_t>>& req)
@@ -656,7 +677,9 @@ handle_request(AppState& app,
     if (method == "UNLOCK") {
         return make_response(http::status::no_content, "");
     }
-
+    if (method == "PROPPATCH") {
+        return make_proppatch_response(target);
+    }
     if (method == "MOVE") {
         auto parsed_src = parse_convert_path(target);
         if (!parsed_src || parsed_src->op.empty() || parsed_src->section != "out" || parsed_src->name.empty()) {
