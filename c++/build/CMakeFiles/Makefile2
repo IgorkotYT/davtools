@@ -85,12 +85,12 @@ clean: CMakeFiles/convertdav.dir/clean
 CMakeFiles/convertdav.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/convertdav.dir/build.make CMakeFiles/convertdav.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/convertdav.dir/build.make CMakeFiles/convertdav.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/aridlin/dev/cli/davtools/c++/build/CMakeFiles --progress-num=1,2 "Built target convertdav"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/aridlin/dev/cli/davtools/c++/build/CMakeFiles --progress-num=1,2,3,4 "Built target convertdav"
 .PHONY : CMakeFiles/convertdav.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/convertdav.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/aridlin/dev/cli/davtools/c++/build/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/aridlin/dev/cli/davtools/c++/build/CMakeFiles 4
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/convertdav.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/aridlin/dev/cli/davtools/c++/build/CMakeFiles 0
 .PHONY : CMakeFiles/convertdav.dir/rule
@@ -102,7 +102,7 @@ convertdav: CMakeFiles/convertdav.dir/rule
 # codegen rule for target.
 CMakeFiles/convertdav.dir/codegen:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/convertdav.dir/build.make CMakeFiles/convertdav.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/aridlin/dev/cli/davtools/c++/build/CMakeFiles --progress-num=1,2 "Finished codegen for target convertdav"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/aridlin/dev/cli/davtools/c++/build/CMakeFiles --progress-num=1,2,3,4 "Finished codegen for target convertdav"
 .PHONY : CMakeFiles/convertdav.dir/codegen
 
 # clean rule for target.

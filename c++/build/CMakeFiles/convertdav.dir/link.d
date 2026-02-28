@@ -3,6 +3,8 @@ convertdav: \
   /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/crti.o \
   /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/crtbeginS.o \
   CMakeFiles/convertdav.dir/src/main.cpp.o \
+  CMakeFiles/convertdav.dir/src/server.cpp.o \
+  CMakeFiles/convertdav.dir/src/converters.cpp.o \
   /usr/lib/libssl.so \
   /usr/lib/libcrypto.so \
   /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/libpthread.a \
@@ -90,6 +92,10 @@ convertdav: \
 /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/crtbeginS.o:
 
 CMakeFiles/convertdav.dir/src/main.cpp.o:
+
+CMakeFiles/convertdav.dir/src/server.cpp.o:
+
+CMakeFiles/convertdav.dir/src/converters.cpp.o:
 
 /usr/lib/libssl.so:
 

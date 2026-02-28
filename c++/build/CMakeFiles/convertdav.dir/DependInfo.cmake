@@ -8,7 +8,9 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "/home/aridlin/dev/cli/davtools/c++/src/converters.cpp" "CMakeFiles/convertdav.dir/src/converters.cpp.o" "gcc" "CMakeFiles/convertdav.dir/src/converters.cpp.o.d"
   "/home/aridlin/dev/cli/davtools/c++/src/main.cpp" "CMakeFiles/convertdav.dir/src/main.cpp.o" "gcc" "CMakeFiles/convertdav.dir/src/main.cpp.o.d"
+  "/home/aridlin/dev/cli/davtools/c++/src/server.cpp" "CMakeFiles/convertdav.dir/src/server.cpp.o" "gcc" "CMakeFiles/convertdav.dir/src/server.cpp.o.d"
   "" "convertdav" "gcc" "CMakeFiles/convertdav.dir/link.d"
   )
 

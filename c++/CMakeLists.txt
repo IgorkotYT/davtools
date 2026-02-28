@@ -10,25 +10,27 @@ find_package(ImageMagick REQUIRED COMPONENTS Magick++)
 
 add_executable(convertdav
     src/main.cpp
+    src/server.cpp
+    src/converters.cpp
+)
+
+target_include_directories(convertdav PRIVATE
+    ${ImageMagick_INCLUDE_DIRS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
 target_link_libraries(convertdav PRIVATE
     OpenSSL::SSL
     OpenSSL::Crypto
     pthread
+    ${ImageMagick_LIBRARIES}
 )
+
+# Arch ImageMagick (Q16HDRI) ABI defines
 target_compile_definitions(convertdav PRIVATE
     MAGICKCORE_QUANTUM_DEPTH=16
     MAGICKCORE_HDRI_ENABLE=1
 )
-# ImageMagick (CMake module style)
-target_include_directories(convertdav PRIVATE ${ImageMagick_INCLUDE_DIRS})
-target_link_libraries(convertdav PRIVATE ${ImageMagick_LIBRARIES})
-
-# Some installs expose needed defs here (safe if empty)
-if (ImageMagick_DEFINITIONS)
-    target_compile_definitions(convertdav PRIVATE ${ImageMagick_DEFINITIONS})
-endif()
 
 target_compile_options(convertdav PRIVATE
     -Wall -Wextra -Wpedantic

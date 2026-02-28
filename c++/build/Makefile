@@ -129,6 +129,30 @@ convertdav/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/convertdav.dir/build.make CMakeFiles/convertdav.dir/build
 .PHONY : convertdav/fast
 
+src/converters.o: src/converters.cpp.o
+.PHONY : src/converters.o
+
+# target to build an object file
+src/converters.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/convertdav.dir/build.make CMakeFiles/convertdav.dir/src/converters.cpp.o
+.PHONY : src/converters.cpp.o
+
+src/converters.i: src/converters.cpp.i
+.PHONY : src/converters.i
+
+# target to preprocess a source file
+src/converters.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/convertdav.dir/build.make CMakeFiles/convertdav.dir/src/converters.cpp.i
+.PHONY : src/converters.cpp.i
+
+src/converters.s: src/converters.cpp.s
+.PHONY : src/converters.s
+
+# target to generate assembly for a file
+src/converters.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/convertdav.dir/build.make CMakeFiles/convertdav.dir/src/converters.cpp.s
+.PHONY : src/converters.cpp.s
+
 src/main.o: src/main.cpp.o
 .PHONY : src/main.o
 
@@ -153,6 +177,30 @@ src/main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/convertdav.dir/build.make CMakeFiles/convertdav.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
 
+src/server.o: src/server.cpp.o
+.PHONY : src/server.o
+
+# target to build an object file
+src/server.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/convertdav.dir/build.make CMakeFiles/convertdav.dir/src/server.cpp.o
+.PHONY : src/server.cpp.o
+
+src/server.i: src/server.cpp.i
+.PHONY : src/server.i
+
+# target to preprocess a source file
+src/server.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/convertdav.dir/build.make CMakeFiles/convertdav.dir/src/server.cpp.i
+.PHONY : src/server.cpp.i
+
+src/server.s: src/server.cpp.s
+.PHONY : src/server.s
+
+# target to generate assembly for a file
+src/server.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/convertdav.dir/build.make CMakeFiles/convertdav.dir/src/server.cpp.s
+.PHONY : src/server.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -162,9 +210,15 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... convertdav"
+	@echo "... src/converters.o"
+	@echo "... src/converters.i"
+	@echo "... src/converters.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
+	@echo "... src/server.o"
+	@echo "... src/server.i"
+	@echo "... src/server.s"
 .PHONY : help
 
 
