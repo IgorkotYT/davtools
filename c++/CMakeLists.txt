@@ -6,16 +6,21 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 find_package(OpenSSL REQUIRED)
-find_package(ImageMagick REQUIRED COMPONENTS Magick++)
+find_package(PkgConfig REQUIRED)
+
+pkg_check_modules(MAGICKPP REQUIRED IMPORTED_TARGET Magick++)
 
 add_executable(convertdav
     src/main.cpp
     src/server.cpp
-    src/converters.cpp
+    src/converters/registry.cpp
+    src/converters/png_jpg.cpp
+    src/converters/invert.cpp
+    src/converters/img_gif.cpp
+    src/converters/pdf_png.cpp
 )
 
 target_include_directories(convertdav PRIVATE
-    ${ImageMagick_INCLUDE_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
@@ -23,10 +28,10 @@ target_link_libraries(convertdav PRIVATE
     OpenSSL::SSL
     OpenSSL::Crypto
     pthread
-    ${ImageMagick_LIBRARIES}
+    PkgConfig::MAGICKPP
 )
 
-# Arch ImageMagick (Q16HDRI) ABI defines
+# Keep these for Arch Q16HDRI builds (safe even if pkg-config also provides them)
 target_compile_definitions(convertdav PRIVATE
     MAGICKCORE_QUANTUM_DEPTH=16
     MAGICKCORE_HDRI_ENABLE=1

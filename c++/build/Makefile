@@ -129,29 +129,125 @@ convertdav/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/convertdav.dir/build.make CMakeFiles/convertdav.dir/build
 .PHONY : convertdav/fast
 
-src/converters.o: src/converters.cpp.o
-.PHONY : src/converters.o
+src/converters/img_gif.o: src/converters/img_gif.cpp.o
+.PHONY : src/converters/img_gif.o
 
 # target to build an object file
-src/converters.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/convertdav.dir/build.make CMakeFiles/convertdav.dir/src/converters.cpp.o
-.PHONY : src/converters.cpp.o
+src/converters/img_gif.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/convertdav.dir/build.make CMakeFiles/convertdav.dir/src/converters/img_gif.cpp.o
+.PHONY : src/converters/img_gif.cpp.o
 
-src/converters.i: src/converters.cpp.i
-.PHONY : src/converters.i
+src/converters/img_gif.i: src/converters/img_gif.cpp.i
+.PHONY : src/converters/img_gif.i
 
 # target to preprocess a source file
-src/converters.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/convertdav.dir/build.make CMakeFiles/convertdav.dir/src/converters.cpp.i
-.PHONY : src/converters.cpp.i
+src/converters/img_gif.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/convertdav.dir/build.make CMakeFiles/convertdav.dir/src/converters/img_gif.cpp.i
+.PHONY : src/converters/img_gif.cpp.i
 
-src/converters.s: src/converters.cpp.s
-.PHONY : src/converters.s
+src/converters/img_gif.s: src/converters/img_gif.cpp.s
+.PHONY : src/converters/img_gif.s
 
 # target to generate assembly for a file
-src/converters.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/convertdav.dir/build.make CMakeFiles/convertdav.dir/src/converters.cpp.s
-.PHONY : src/converters.cpp.s
+src/converters/img_gif.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/convertdav.dir/build.make CMakeFiles/convertdav.dir/src/converters/img_gif.cpp.s
+.PHONY : src/converters/img_gif.cpp.s
+
+src/converters/invert.o: src/converters/invert.cpp.o
+.PHONY : src/converters/invert.o
+
+# target to build an object file
+src/converters/invert.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/convertdav.dir/build.make CMakeFiles/convertdav.dir/src/converters/invert.cpp.o
+.PHONY : src/converters/invert.cpp.o
+
+src/converters/invert.i: src/converters/invert.cpp.i
+.PHONY : src/converters/invert.i
+
+# target to preprocess a source file
+src/converters/invert.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/convertdav.dir/build.make CMakeFiles/convertdav.dir/src/converters/invert.cpp.i
+.PHONY : src/converters/invert.cpp.i
+
+src/converters/invert.s: src/converters/invert.cpp.s
+.PHONY : src/converters/invert.s
+
+# target to generate assembly for a file
+src/converters/invert.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/convertdav.dir/build.make CMakeFiles/convertdav.dir/src/converters/invert.cpp.s
+.PHONY : src/converters/invert.cpp.s
+
+src/converters/pdf_png.o: src/converters/pdf_png.cpp.o
+.PHONY : src/converters/pdf_png.o
+
+# target to build an object file
+src/converters/pdf_png.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/convertdav.dir/build.make CMakeFiles/convertdav.dir/src/converters/pdf_png.cpp.o
+.PHONY : src/converters/pdf_png.cpp.o
+
+src/converters/pdf_png.i: src/converters/pdf_png.cpp.i
+.PHONY : src/converters/pdf_png.i
+
+# target to preprocess a source file
+src/converters/pdf_png.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/convertdav.dir/build.make CMakeFiles/convertdav.dir/src/converters/pdf_png.cpp.i
+.PHONY : src/converters/pdf_png.cpp.i
+
+src/converters/pdf_png.s: src/converters/pdf_png.cpp.s
+.PHONY : src/converters/pdf_png.s
+
+# target to generate assembly for a file
+src/converters/pdf_png.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/convertdav.dir/build.make CMakeFiles/convertdav.dir/src/converters/pdf_png.cpp.s
+.PHONY : src/converters/pdf_png.cpp.s
+
+src/converters/png_jpg.o: src/converters/png_jpg.cpp.o
+.PHONY : src/converters/png_jpg.o
+
+# target to build an object file
+src/converters/png_jpg.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/convertdav.dir/build.make CMakeFiles/convertdav.dir/src/converters/png_jpg.cpp.o
+.PHONY : src/converters/png_jpg.cpp.o
+
+src/converters/png_jpg.i: src/converters/png_jpg.cpp.i
+.PHONY : src/converters/png_jpg.i
+
+# target to preprocess a source file
+src/converters/png_jpg.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/convertdav.dir/build.make CMakeFiles/convertdav.dir/src/converters/png_jpg.cpp.i
+.PHONY : src/converters/png_jpg.cpp.i
+
+src/converters/png_jpg.s: src/converters/png_jpg.cpp.s
+.PHONY : src/converters/png_jpg.s
+
+# target to generate assembly for a file
+src/converters/png_jpg.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/convertdav.dir/build.make CMakeFiles/convertdav.dir/src/converters/png_jpg.cpp.s
+.PHONY : src/converters/png_jpg.cpp.s
+
+src/converters/registry.o: src/converters/registry.cpp.o
+.PHONY : src/converters/registry.o
+
+# target to build an object file
+src/converters/registry.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/convertdav.dir/build.make CMakeFiles/convertdav.dir/src/converters/registry.cpp.o
+.PHONY : src/converters/registry.cpp.o
+
+src/converters/registry.i: src/converters/registry.cpp.i
+.PHONY : src/converters/registry.i
+
+# target to preprocess a source file
+src/converters/registry.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/convertdav.dir/build.make CMakeFiles/convertdav.dir/src/converters/registry.cpp.i
+.PHONY : src/converters/registry.cpp.i
+
+src/converters/registry.s: src/converters/registry.cpp.s
+.PHONY : src/converters/registry.s
+
+# target to generate assembly for a file
+src/converters/registry.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/convertdav.dir/build.make CMakeFiles/convertdav.dir/src/converters/registry.cpp.s
+.PHONY : src/converters/registry.cpp.s
 
 src/main.o: src/main.cpp.o
 .PHONY : src/main.o
@@ -210,9 +306,21 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... convertdav"
-	@echo "... src/converters.o"
-	@echo "... src/converters.i"
-	@echo "... src/converters.s"
+	@echo "... src/converters/img_gif.o"
+	@echo "... src/converters/img_gif.i"
+	@echo "... src/converters/img_gif.s"
+	@echo "... src/converters/invert.o"
+	@echo "... src/converters/invert.i"
+	@echo "... src/converters/invert.s"
+	@echo "... src/converters/pdf_png.o"
+	@echo "... src/converters/pdf_png.i"
+	@echo "... src/converters/pdf_png.s"
+	@echo "... src/converters/png_jpg.o"
+	@echo "... src/converters/png_jpg.i"
+	@echo "... src/converters/png_jpg.s"
+	@echo "... src/converters/registry.o"
+	@echo "... src/converters/registry.i"
+	@echo "... src/converters/registry.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"

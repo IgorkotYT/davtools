@@ -8,7 +8,11 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/home/aridlin/dev/cli/davtools/c++/src/converters.cpp" "CMakeFiles/convertdav.dir/src/converters.cpp.o" "gcc" "CMakeFiles/convertdav.dir/src/converters.cpp.o.d"
+  "/home/aridlin/dev/cli/davtools/c++/src/converters/img_gif.cpp" "CMakeFiles/convertdav.dir/src/converters/img_gif.cpp.o" "gcc" "CMakeFiles/convertdav.dir/src/converters/img_gif.cpp.o.d"
+  "/home/aridlin/dev/cli/davtools/c++/src/converters/invert.cpp" "CMakeFiles/convertdav.dir/src/converters/invert.cpp.o" "gcc" "CMakeFiles/convertdav.dir/src/converters/invert.cpp.o.d"
+  "/home/aridlin/dev/cli/davtools/c++/src/converters/pdf_png.cpp" "CMakeFiles/convertdav.dir/src/converters/pdf_png.cpp.o" "gcc" "CMakeFiles/convertdav.dir/src/converters/pdf_png.cpp.o.d"
+  "/home/aridlin/dev/cli/davtools/c++/src/converters/png_jpg.cpp" "CMakeFiles/convertdav.dir/src/converters/png_jpg.cpp.o" "gcc" "CMakeFiles/convertdav.dir/src/converters/png_jpg.cpp.o.d"
+  "/home/aridlin/dev/cli/davtools/c++/src/converters/registry.cpp" "CMakeFiles/convertdav.dir/src/converters/registry.cpp.o" "gcc" "CMakeFiles/convertdav.dir/src/converters/registry.cpp.o.d"
   "/home/aridlin/dev/cli/davtools/c++/src/main.cpp" "CMakeFiles/convertdav.dir/src/main.cpp.o" "gcc" "CMakeFiles/convertdav.dir/src/main.cpp.o.d"
   "/home/aridlin/dev/cli/davtools/c++/src/server.cpp" "CMakeFiles/convertdav.dir/src/server.cpp.o" "gcc" "CMakeFiles/convertdav.dir/src/server.cpp.o.d"
   "" "convertdav" "gcc" "CMakeFiles/convertdav.dir/link.d"

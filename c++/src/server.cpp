@@ -4,6 +4,8 @@
 #include <boost/beast/core.hpp>
 #include <boost/beast/http.hpp>
 
+#include <algorithm>
+#include <array>
 #include <cctype>
 #include <ctime>
 #include <iostream>
@@ -12,14 +14,28 @@
 #include <string>
 #include <string_view>
 #include <thread>
+#include <vector>
 
 namespace beast = boost::beast;
-namespace http  = beast::http;
+namespace http  = boost::beast::http;
 namespace asio  = boost::asio;
 using tcp = asio::ip::tcp;
 
-static constexpr std::string_view kTop  = "/convert";
-static constexpr std::string_view kBase = "/convert/png-jpg";
+static constexpr std::string_view kTop = "/convert";
+
+// Add new converter names here when you add files to the registry.
+static const std::array<std::string_view, 4> kConverters = {
+    "png-jpg",
+    "invert",
+    "img-gif",
+    "pdf-png"
+};
+
+struct ParsedConvertPath {
+    std::string op;      // converter name
+    std::string section; // "", "in", "out"
+    std::string name;    // filename (may be empty)
+};
 
 static bool starts_with(std::string_view s, std::string_view p) {
     return s.size() >= p.size() && s.substr(0, p.size()) == p;
@@ -33,6 +49,13 @@ static std::string trim_trailing_slash(std::string s) {
 static std::string to_lower_copy(std::string s) {
     for (char& c : s) c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
     return s;
+}
+
+static bool is_known_converter(std::string_view op) {
+    for (auto v : kConverters) {
+        if (v == op) return true;
+    }
+    return false;
 }
 
 static std::string xml_escape(std::string_view in) {
@@ -51,10 +74,57 @@ static std::string xml_escape(std::string_view in) {
     return out;
 }
 
-static std::string replace_ext_to_jpg(std::string name) {
-    auto pos = name.find_last_of('.');
-    if (pos == std::string::npos) return name + ".jpg";
-    return name.substr(0, pos) + ".jpg";
+static std::string make_key(std::string_view op, std::string_view name) {
+    std::string k;
+    k.reserve(op.size() + 1 + name.size());
+    k.append(op);
+    k.push_back('/');
+    k.append(name);
+    return k;
+}
+
+static std::string filename_from_key_for_op(std::string_view key, std::string_view op) {
+    const std::string prefix = std::string(op) + "/";
+    if (!starts_with(key, prefix)) return {};
+    return std::string(key.substr(prefix.size()));
+}
+
+static std::optional<ParsedConvertPath> parse_convert_path(std::string_view target_raw) {
+    // Normalize for matching, but keep original target elsewhere for DAV self hrefs.
+    std::string target = trim_trailing_slash(std::string(target_raw));
+
+    if (!starts_with(target, "/convert")) return std::nullopt;
+    if (target == "/convert") return ParsedConvertPath{}; // top collection
+
+    if (!starts_with(target, "/convert/")) return std::nullopt;
+
+    // /convert/<op>[/<section>[/<name>]]
+    std::string rest = target.substr(std::string("/convert/").size());
+    if (rest.empty()) return std::nullopt;
+
+    auto slash1 = rest.find('/');
+    if (slash1 == std::string::npos) {
+        return ParsedConvertPath{ .op = rest, .section = "", .name = "" };
+    }
+
+    std::string op = rest.substr(0, slash1);
+    std::string tail = rest.substr(slash1 + 1);
+
+    if (tail.empty()) return ParsedConvertPath{ .op = std::move(op), .section = "", .name = "" };
+
+    auto slash2 = tail.find('/');
+    if (slash2 == std::string::npos) {
+        return ParsedConvertPath{ .op = std::move(op), .section = tail, .name = "" };
+    }
+
+    std::string section = tail.substr(0, slash2);
+    std::string name    = tail.substr(slash2 + 1);
+
+    return ParsedConvertPath{
+        .op = std::move(op),
+        .section = std::move(section),
+        .name = std::move(name)
+    };
 }
 
 static std::optional<std::string> extract_path_from_destination(std::string dest) {
@@ -75,7 +145,6 @@ static std::optional<std::string> extract_path_from_destination(std::string dest
     }
 
     if (!dest.empty() && dest.front() == '/') return dest;
-
     return std::nullopt;
 }
 
@@ -84,9 +153,9 @@ static int propfind_depth(const http::request<http::vector_body<std::uint8_t>>& 
         std::string d = to_lower_copy(std::string(it->value()));
         if (d == "0") return 0;
         if (d == "1") return 1;
-        if (d == "infinity") return 999; // not fully supported, but okay for branching
+        if (d == "infinity") return 999;
     }
-    return 0; // safest default for Windows probes
+    return 0;
 }
 
 static std::string rfc1123_utc(std::chrono::system_clock::time_point tp) {
@@ -125,6 +194,7 @@ static std::string guess_content_type_from_name(const std::string& name) {
     if (lower.size() >= 5 && lower.substr(lower.size() - 5) == ".jpeg") return "image/jpeg";
     if (lower.size() >= 4 && lower.substr(lower.size() - 4) == ".png")  return "image/png";
     if (lower.size() >= 4 && lower.substr(lower.size() - 4) == ".gif")  return "image/gif";
+    if (lower.size() >= 4 && lower.substr(lower.size() - 4) == ".pdf")  return "application/pdf";
     if (lower.size() >= 4 && lower.substr(lower.size() - 4) == ".txt")  return "text/plain";
     return "application/octet-stream";
 }
@@ -144,7 +214,7 @@ static void append_dav_collection_response(std::ostringstream& x,
       << "<D:creationdate>" << iso8601_utc(ts) << "</D:creationdate>"
       << "<D:getlastmodified>" << rfc1123_utc(ts) << "</D:getlastmodified>"
 
-      // Windows tends to like seeing lock capability info
+      // MiniRedir likes seeing lock capability info
       << "<D:supportedlock>"
       <<   "<D:lockentry>"
       <<     "<D:lockscope><D:exclusive/></D:lockscope>"
@@ -170,7 +240,7 @@ static void append_dav_file_response(std::ostringstream& x,
       << "<D:displayname>" << xml_escape(name) << "</D:displayname>"
       << "<D:resourcetype/>"
       << "<D:getcontentlength>" << blob.data.size() << "</D:getcontentlength>"
-      << "<D:getcontenttype>" << xml_escape(guess_content_type_from_name(std::string(name))) << "</D:getcontenttype>"
+      << "<D:getcontenttype>" << xml_escape(blob.content_type) << "</D:getcontenttype>"
       << "<D:creationdate>" << iso8601_utc(blob.created_wall) << "</D:creationdate>"
       << "<D:getlastmodified>" << rfc1123_utc(blob.created_wall) << "</D:getlastmodified>"
       << "</D:prop>"
@@ -191,61 +261,36 @@ static std::string dav_multistatus_for_single_file(std::string_view href,
     return x.str();
 }
 
-static std::string dav_multistatus_for_convert(const AppState& state,
-                                               bool include_children,
-                                               std::string_view self_href)
+static std::string dav_multistatus_for_root(std::chrono::system_clock::time_point ts,
+                                            bool include_children)
 {
     std::ostringstream x;
     x << R"(<?xml version="1.0" encoding="utf-8"?>)"
       << R"(<D:multistatus xmlns:D="DAV:">)";
 
-    // exact requested path for Depth:0 validation
-    append_dav_collection_response(x, self_href, "convert", state.server_started_wall);
-
+    append_dav_collection_response(x, "/", "/", ts);
     if (include_children) {
-        append_dav_collection_response(x, "/convert/png-jpg/", "png-jpg", state.server_started_wall);
+        append_dav_collection_response(x, "/convert/", "convert", ts);
     }
 
     x << "</D:multistatus>";
     return x.str();
 }
 
-static std::string dav_multistatus_for_root(const AppState& state,
-                                            bool include_children,
-                                            std::string_view self_href)
+static std::string dav_multistatus_for_convert_collection(std::chrono::system_clock::time_point ts,
+                                                          bool include_children,
+                                                          std::string_view self_href)
 {
     std::ostringstream x;
     x << R"(<?xml version="1.0" encoding="utf-8"?>)"
       << R"(<D:multistatus xmlns:D="DAV:">)";
 
-    // exact requested path for Depth:0 validation
-    append_dav_collection_response(x, self_href, "png-jpg", state.server_started_wall);
+    append_dav_collection_response(x, self_href, "convert", ts);
 
     if (include_children) {
-        append_dav_collection_response(x, "/convert/png-jpg/in/",  "in",  state.server_started_wall);
-        append_dav_collection_response(x, "/convert/png-jpg/out/", "out", state.server_started_wall);
-    }
-
-    x << "</D:multistatus>";
-    return x.str();
-}
-
-static std::string dav_multistatus_for_in(const AppState& state, bool include_children) {
-    std::ostringstream x;
-    x << R"(<?xml version="1.0" encoding="utf-8"?>)"
-      << R"(<D:multistatus xmlns:D="DAV:">)";
-
-    append_dav_collection_response(x, "/convert/png-jpg/in/", "in", state.server_started_wall);
-
-    // Optional: include placeholders if Explorer asks Depth:1
-    if (include_children) {
-        for (const auto& [name, blob] : state.in_files) {
-            append_dav_file_response(
-                x,
-                std::string("/convert/png-jpg/in/") + name,
-                name,
-                blob
-            );
+        for (auto op : kConverters) {
+            std::string href = "/convert/" + std::string(op) + "/";
+            append_dav_collection_response(x, href, op, ts);
         }
     }
 
@@ -253,21 +298,48 @@ static std::string dav_multistatus_for_in(const AppState& state, bool include_ch
     return x.str();
 }
 
-static std::string dav_multistatus_for_out(const AppState& state, bool include_children) {
+static std::string dav_multistatus_for_converter_root(std::chrono::system_clock::time_point ts,
+                                                      bool include_children,
+                                                      std::string_view op,
+                                                      std::string_view self_href)
+{
     std::ostringstream x;
     x << R"(<?xml version="1.0" encoding="utf-8"?>)"
       << R"(<D:multistatus xmlns:D="DAV:">)";
 
-    append_dav_collection_response(x, "/convert/png-jpg/out/", "out", state.server_started_wall);
+    append_dav_collection_response(x, self_href, op, ts);
 
     if (include_children) {
-        for (const auto& [name, blob] : state.out_files) {
-            append_dav_file_response(
-                x,
-                std::string("/convert/png-jpg/out/") + name,
-                name,
-                blob
-            );
+        append_dav_collection_response(x, "/convert/" + std::string(op) + "/in/",  "in",  ts);
+        append_dav_collection_response(x, "/convert/" + std::string(op) + "/out/", "out", ts);
+    }
+
+    x << "</D:multistatus>";
+    return x.str();
+}
+
+static std::string dav_multistatus_for_io_collection(const UserCache& cache,
+                                                     std::chrono::system_clock::time_point ts,
+                                                     std::string_view op,
+                                                     std::string_view section, // "in" or "out"
+                                                     bool include_children,
+                                                     std::string_view self_href)
+{
+    std::ostringstream x;
+    x << R"(<?xml version="1.0" encoding="utf-8"?>)"
+      << R"(<D:multistatus xmlns:D="DAV:">)";
+
+    append_dav_collection_response(x, self_href, section, ts);
+
+    if (include_children) {
+        const auto& src = (section == "in") ? cache.in_files : cache.out_files;
+        const std::string prefix = std::string(op) + "/";
+
+        for (const auto& [key, blob] : src) {
+            if (!starts_with(key, prefix)) continue;
+            std::string name = key.substr(prefix.size());
+            std::string href = "/convert/" + std::string(op) + "/" + std::string(section) + "/" + name;
+            append_dav_file_response(x, href, name, blob);
         }
     }
 
@@ -279,11 +351,11 @@ static http::response<http::string_body>
 make_response(http::status st, std::string body = "", std::string content_type = "text/plain; charset=utf-8")
 {
     http::response<http::string_body> res{st, 11};
-    res.set(http::field::server, "convertdav/0.4");
+    res.set(http::field::server, "convertdav/0.5");
     if (!content_type.empty()) res.set(http::field::content_type, content_type);
     res.body() = std::move(body);
     res.prepare_payload();
-    res.keep_alive(false); // session loop will override from request
+    res.keep_alive(false); // do_session() will override from req
     return res;
 }
 
@@ -311,28 +383,29 @@ make_lock_response(std::string_view href)
 }
 
 static http::response<http::string_body>
-handle_request(AppState& app, const http::request<http::vector_body<std::uint8_t>>& req)
+handle_request(AppState& app,
+               const std::string& client_ip,
+               const http::request<http::vector_body<std::uint8_t>>& req)
 {
     const std::string target = std::string(req.target());
     const std::string method = std::string(req.method_string());
 
-    // Debug log (Explorer will spam weird sequences)
-    std::cout << "\n=== REQUEST ===\n";
+    std::cout << "\n=== REQUEST [" << client_ip << "] ===\n";
     std::cout << method << " " << target << " HTTP/"
               << (req.version() / 10) << "." << (req.version() % 10) << "\n";
     for (auto const& h : req) {
         std::cout << h.name_string() << ": " << h.value() << "\n";
     }
-    std::cout << "=============\n" << std::flush;
+    std::cout << "=======================\n" << std::flush;
 
     if (method == "OPTIONS") {
         auto res = make_response(http::status::ok, "");
         res.set("DAV", "1,2");
         res.set("MS-Author-Via", "DAV");
         res.set(http::field::allow,
-            "OPTIONS, GET, HEAD, PUT, DELETE, MKCOL, COPY, MOVE, PROPFIND, PROPPATCH, LOCK, UNLOCK");
+                "OPTIONS, GET, HEAD, PUT, DELETE, MKCOL, COPY, MOVE, PROPFIND, PROPPATCH, LOCK, UNLOCK");
         res.set("Public",
-            "OPTIONS, GET, HEAD, PUT, DELETE, MKCOL, COPY, MOVE, PROPFIND, PROPPATCH, LOCK, UNLOCK");
+                "OPTIONS, GET, HEAD, PUT, DELETE, MKCOL, COPY, MOVE, PROPFIND, PROPPATCH, LOCK, UNLOCK");
         res.set("Accept-Ranges", "bytes");
         res.set("Cache-Control", "no-cache");
         return res;
@@ -343,168 +416,148 @@ handle_request(AppState& app, const http::request<http::vector_body<std::uint8_t
         const int depth = propfind_depth(req);
         const bool include_children = (depth >= 1);
 
-        if (t == std::string(kTop)) {
-            return make_response(
-                static_cast<http::status>(207),
-                dav_multistatus_for_convert(app, include_children, target),
-                "text/xml; charset=utf-8"
-            );
-        }
-
-        if (t == std::string(kBase)) {
-            return make_response(
-                static_cast<http::status>(207),
-                dav_multistatus_for_root(app, include_children, target),
-                "text/xml; charset=utf-8"
-            );
-        }
-
-        if (t == std::string(kBase) + "/out") {
-            std::scoped_lock lock(app.mtx);
-            return make_response(
-                static_cast<http::status>(207),
-                dav_multistatus_for_out(app, include_children),
-                "text/xml; charset=utf-8"
-            );
-        }
-
-        if (t == std::string(kBase) + "/in") {
-            std::scoped_lock lock(app.mtx);
-            return make_response(
-                static_cast<http::status>(207),
-                dav_multistatus_for_in(app, include_children),
-                "text/xml; charset=utf-8"
-            );
-        }
-
-        // PROPFIND for file under /in/
-        if (starts_with(t, std::string(kBase) + "/in/")) {
-            std::string name = t.substr(std::string(kBase).size() + 4); // "/in/"
-            if (!name.empty()) {
-                std::scoped_lock lock(app.mtx);
-                auto it = app.in_files.find(name);
-                if (it != app.in_files.end()) {
-                    return make_response(
-                        static_cast<http::status>(207),
-                        dav_multistatus_for_single_file(target, name, it->second),
-                        "text/xml; charset=utf-8"
-                    );
-                }
-            }
-            return make_response(http::status::not_found, "PROPFIND target not found\n");
-        }
-
-        // PROPFIND for file under /out/
-        if (starts_with(t, std::string(kBase) + "/out/")) {
-            std::string name = t.substr(std::string(kBase).size() + 5); // "/out/"
-            if (!name.empty()) {
-                std::scoped_lock lock(app.mtx);
-                auto it = app.out_files.find(name);
-                if (it != app.out_files.end()) {
-                    return make_response(
-                        static_cast<http::status>(207),
-                        dav_multistatus_for_single_file(target, name, it->second),
-                        "text/xml; charset=utf-8"
-                    );
-                }
-            }
-            return make_response(http::status::not_found, "PROPFIND target not found\n");
-        }
-
         if (t == "/") {
-            std::ostringstream x;
-            x << R"(<?xml version="1.0" encoding="utf-8"?>)"
-              << R"(<D:multistatus xmlns:D="DAV:">)";
-            append_dav_collection_response(x, "/", "/", app.server_started_wall);
-            if (include_children) {
-                append_dav_collection_response(x, "/convert/", "convert", app.server_started_wall);
+            return make_response(
+                static_cast<http::status>(207),
+                dav_multistatus_for_root(app.server_started_wall, include_children),
+                "text/xml; charset=utf-8"
+            );
+        }
+
+        if (t == "/convert") {
+            return make_response(
+                static_cast<http::status>(207),
+                dav_multistatus_for_convert_collection(app.server_started_wall, include_children, target),
+                "text/xml; charset=utf-8"
+            );
+        }
+
+        auto parsed = parse_convert_path(target);
+        if (!parsed) {
+            return make_response(http::status::not_found, "PROPFIND target not found\n");
+        }
+
+        if (!parsed->op.empty() && !is_known_converter(parsed->op)) {
+            return make_response(http::status::not_found, "Unknown converter\n");
+        }
+
+        // /convert/<op>
+        if (!parsed->op.empty() && parsed->section.empty()) {
+            return make_response(
+                static_cast<http::status>(207),
+                dav_multistatus_for_converter_root(app.server_started_wall, include_children, parsed->op, target),
+                "text/xml; charset=utf-8"
+            );
+        }
+
+        // /convert/<op>/in or /convert/<op>/out
+        if (!parsed->op.empty() &&
+            (parsed->section == "in" || parsed->section == "out") &&
+            parsed->name.empty())
+        {
+            std::scoped_lock lock(app.mtx);
+            UserCache& uc = app.users[client_ip];
+            return make_response(
+                static_cast<http::status>(207),
+                dav_multistatus_for_io_collection(uc, app.server_started_wall, parsed->op, parsed->section, include_children, target),
+                "text/xml; charset=utf-8"
+            );
+        }
+
+        // /convert/<op>/in/<file> or /convert/<op>/out/<file>
+        if (!parsed->op.empty() &&
+            (parsed->section == "in" || parsed->section == "out") &&
+            !parsed->name.empty())
+        {
+            const std::string key = make_key(parsed->op, parsed->name);
+
+            std::scoped_lock lock(app.mtx);
+            UserCache& uc = app.users[client_ip];
+            const auto& src = (parsed->section == "in") ? uc.in_files : uc.out_files;
+
+            auto it = src.find(key);
+            if (it == src.end()) {
+                return make_response(http::status::not_found, "PROPFIND target not found\n");
             }
-            x << "</D:multistatus>";
-            return make_response(static_cast<http::status>(207), x.str(), "text/xml; charset=utf-8");
+
+            return make_response(
+                static_cast<http::status>(207),
+                dav_multistatus_for_single_file(target, parsed->name, it->second),
+                "text/xml; charset=utf-8"
+            );
         }
 
         return make_response(http::status::not_found, "PROPFIND target not found\n");
     }
 
     if (req.method() == http::verb::get || req.method() == http::verb::head) {
-        // GET/HEAD for placeholder files under /in/
-        if (starts_with(target, std::string(kBase) + "/in/")) {
-            std::string name = target.substr(std::string(kBase).size() + 4); // "/in/"
-            if (!name.empty()) {
-                std::scoped_lock lock(app.mtx);
-                auto it = app.in_files.find(name);
-                if (it == app.in_files.end()) {
-                    return make_response(http::status::not_found, "No such input placeholder\n");
-                }
+        const bool is_head = (req.method() == http::verb::head);
 
-                auto res = make_response(
-                    http::status::ok,
-                    (req.method() == http::verb::head) ? "" : it->second.data,
-                    "application/octet-stream"
-                );
-                if (req.method() == http::verb::head) {
-                    res.content_length(it->second.data.size());
-                }
-                return res;
-            }
-            // empty name => this is the /in/ collection path; fall through to sanity paths below
-        }
-
-        // GET/HEAD for files under /out/
-        if (starts_with(target, std::string(kBase) + "/out/")) {
-            std::string name = target.substr(std::string(kBase).size() + 5); // "/out/"
-            if (!name.empty()) {
-                std::scoped_lock lock(app.mtx);
-                auto it = app.out_files.find(name);
-                if (it == app.out_files.end()) return make_response(http::status::not_found, "No such converted file\n");
-
-                std::string ct = guess_content_type_from_name(name);
-                auto res = make_response(
-                    http::status::ok,
-                    (req.method() == http::verb::head) ? "" : it->second.data,
-                    ct
-                );
-                if (req.method() == http::verb::head) {
-                    res.content_length(it->second.data.size());
-                }
-                return res;
-            }
-            // empty name => this is the /out/ collection path; fall through
-        }
-
+        // Browser / sanity endpoints
         if (target == "/" || target == "/index.html") {
             return make_response(http::status::ok,
-                "convertdav milestone 1\nUse WebDAV paths under /convert/png-jpg/\n");
+                "convertdav\nUse WebDAV paths under /convert/<op>/ (e.g. /convert/png-jpg/)\n");
         }
-
         if (target == "/convert" || target == "/convert/") {
             return make_response(http::status::ok, "convert/\n");
         }
 
-        if (target == "/convert/png-jpg" || target == "/convert/png-jpg/") {
-            return make_response(http::status::ok, "WebDAV endpoint ready (/convert/png-jpg/)\n");
+        auto parsed = parse_convert_path(target);
+        if (!parsed) {
+            return make_response(http::status::not_found, "GET target not found\n");
         }
 
-        if (target == "/convert/png-jpg/in" || target == "/convert/png-jpg/in/") {
-            return make_response(http::status::ok, "in/\n");
+        if (!parsed->op.empty() && !is_known_converter(parsed->op)) {
+            return make_response(http::status::not_found, "Unknown converter\n");
         }
 
-        if (target == "/convert/png-jpg/out" || target == "/convert/png-jpg/out/") {
-            return make_response(http::status::ok, "out/\n");
+        // Collection sanity text for browsers
+        if (!parsed->op.empty() && parsed->section.empty()) {
+            return make_response(http::status::ok,
+                                 "WebDAV endpoint ready (/convert/" + parsed->op + "/)\n");
+        }
+        if (!parsed->op.empty() && (parsed->section == "in" || parsed->section == "out") && parsed->name.empty()) {
+            return make_response(http::status::ok, parsed->section + "/\n");
+        }
+
+        // File reads
+        if (!parsed->op.empty() && (parsed->section == "in" || parsed->section == "out") && !parsed->name.empty()) {
+            const std::string key = make_key(parsed->op, parsed->name);
+
+            std::scoped_lock lock(app.mtx);
+            UserCache& uc = app.users[client_ip];
+            const auto& src = (parsed->section == "in") ? uc.in_files : uc.out_files;
+
+            auto it = src.find(key);
+            if (it == src.end()) {
+                return make_response(http::status::not_found, "No such file\n");
+            }
+
+            const std::string ct = it->second.content_type.empty()
+                ? guess_content_type_from_name(parsed->name)
+                : it->second.content_type;
+
+            auto res = make_response(
+                http::status::ok,
+                is_head ? "" : it->second.data,
+                ct
+            );
+            if (is_head) {
+                res.content_length(it->second.data.size());
+            }
+            return res;
         }
 
         return make_response(http::status::not_found, "GET target not found\n");
     }
 
     if (req.method() == http::verb::put) {
-        const std::string prefix = std::string(kBase) + "/in/";
-        if (!starts_with(target, prefix)) {
-            return make_response(http::status::not_found, "PUT only allowed to /in/\n");
+        auto parsed = parse_convert_path(target);
+        if (!parsed || parsed->op.empty() || parsed->section != "in" || parsed->name.empty()) {
+            return make_response(http::status::not_found, "PUT only allowed to /convert/<op>/in/<file>\n");
         }
-
-        std::string in_name = target.substr(prefix.size());
-        if (in_name.empty()) {
-            return make_response(http::status::bad_request, "Missing input filename\n");
+        if (!is_known_converter(parsed->op)) {
+            return make_response(http::status::not_found, "Unknown converter\n");
         }
 
         constexpr std::size_t MAX_UPLOAD = 50 * 1024 * 1024;
@@ -512,26 +565,32 @@ handle_request(AppState& app, const http::request<http::vector_body<std::uint8_t
             return make_response(http::status::payload_too_large, "File too large\n");
         }
 
-        // Always create/refresh placeholder in /in
+        const std::string in_key = make_key(parsed->op, parsed->name);
+
+        // Always create/refresh placeholder in /in (per-user)
         {
             std::scoped_lock lock(app.mtx);
-            auto& ph = app.in_files[in_name];
+            UserCache& uc = app.users[client_ip];
+            auto& ph = uc.in_files[in_key];
             ph.created_steady = std::chrono::steady_clock::now();
             ph.created_wall   = std::chrono::system_clock::now();
-            ph.data.clear(); // keep placeholders tiny
+            ph.content_type   = guess_content_type_from_name(parsed->name);
+
+            // Explorer often sends zero-byte PUT first - keep placeholder empty
+            if (req.body().empty()) {
+                ph.data.clear();
+            }
         }
 
-        // Explorer often sends zero-byte PUT first as a create step.
-        // Accept it and do not convert yet.
+        // Zero-byte create step: accept and stop here
         if (req.body().empty()) {
             return make_response(http::status::created, "", "");
         }
 
-        // Real upload => convert immediately
-        std::string out_name = replace_ext_to_jpg(in_name);
-        std::string out_data;
+        // Real upload => run converter registry
+        std::vector<OutputArtifact> outputs;
         try {
-            out_data = convert_png_to_jpg(req.body());
+            outputs = run_converter(parsed->op, parsed->name, req.body());
         } catch (const std::exception& e) {
             return make_response(
                 http::status::unsupported_media_type,
@@ -541,22 +600,49 @@ handle_request(AppState& app, const http::request<http::vector_body<std::uint8_t
 
         {
             std::scoped_lock lock(app.mtx);
+            UserCache& uc = app.users[client_ip];
 
-            // refresh placeholder timestamp
-            auto& ph = app.in_files[in_name];
+            // Store uploaded input bytes too (makes Explorer verification happier)
+            auto& ph = uc.in_files[in_key];
             ph.created_steady = std::chrono::steady_clock::now();
             ph.created_wall   = std::chrono::system_clock::now();
+            ph.content_type   = guess_content_type_from_name(parsed->name);
             ph.data.assign(reinterpret_cast<const char*>(req.body().data()), req.body().size());
 
-            app.out_files[out_name] = Blob{
-                .data = std::move(out_data),
-                .created_steady = std::chrono::steady_clock::now(),
-                .created_wall   = std::chrono::system_clock::now()
-            };
+            // Write outputs under this user's cache, namespaced by converter
+            for (auto& art : outputs) {
+                const std::string out_key = make_key(parsed->op, art.name);
+                uc.out_files[out_key] = Blob{
+                    .data = std::move(art.data),
+                    .content_type = art.content_type.empty() ? guess_content_type_from_name(art.name) : art.content_type,
+                    .created_steady = std::chrono::steady_clock::now(),
+                    .created_wall   = std::chrono::system_clock::now()
+                };
+            }
         }
 
-        // Empty success response tends to play nicer with WebDAV clients
         return make_response(http::status::created, "", "");
+    }
+
+    if (req.method() == http::verb::delete_) {
+        auto parsed = parse_convert_path(target);
+        if (!parsed || parsed->op.empty() || parsed->name.empty() ||
+            (parsed->section != "in" && parsed->section != "out"))
+        {
+            return make_response(http::status::not_found, "DELETE target not found\n");
+        }
+
+        const std::string key = make_key(parsed->op, parsed->name);
+
+        std::scoped_lock lock(app.mtx);
+        UserCache& uc = app.users[client_ip];
+        auto& src = (parsed->section == "in") ? uc.in_files : uc.out_files;
+
+        auto it = src.find(key);
+        if (it == src.end()) return make_response(http::status::not_found, "No such file\n");
+
+        src.erase(it);
+        return make_response(http::status::no_content, "");
     }
 
     if (method == "MKCOL") {
@@ -572,7 +658,10 @@ handle_request(AppState& app, const http::request<http::vector_body<std::uint8_t
     }
 
     if (method == "MOVE") {
-        std::string src = target;
+        auto parsed_src = parse_convert_path(target);
+        if (!parsed_src || parsed_src->op.empty() || parsed_src->section != "out" || parsed_src->name.empty()) {
+            return make_response(http::status::method_not_allowed, "MOVE only supported for /convert/<op>/out/<file>\n");
+        }
 
         auto dest_it = req.find("Destination");
         if (dest_it == req.end()) {
@@ -583,17 +672,15 @@ handle_request(AppState& app, const http::request<http::vector_body<std::uint8_t
         if (!dest_path_opt) {
             return make_response(http::status::bad_request, "Invalid Destination header\n");
         }
-        std::string dst = *dest_path_opt;
 
-        const std::string out_prefix = std::string(kBase) + "/out/";
-        if (!starts_with(src, out_prefix) || !starts_with(dst, out_prefix)) {
-            return make_response(http::status::method_not_allowed, "MOVE only supported inside /out/\n");
+        auto parsed_dst = parse_convert_path(*dest_path_opt);
+        if (!parsed_dst || parsed_dst->op.empty() || parsed_dst->section != "out" || parsed_dst->name.empty()) {
+            return make_response(http::status::method_not_allowed, "MOVE destination must be /convert/<op>/out/<file>\n");
         }
 
-        std::string src_name = src.substr(out_prefix.size());
-        std::string dst_name = dst.substr(out_prefix.size());
-        if (src_name.empty() || dst_name.empty()) {
-            return make_response(http::status::bad_request, "Invalid MOVE source/destination\n");
+        // Keep MOVE inside same converter for now
+        if (parsed_src->op != parsed_dst->op) {
+            return make_response(http::status::method_not_allowed, "MOVE across converters not supported\n");
         }
 
         bool overwrite = true;
@@ -602,23 +689,27 @@ handle_request(AppState& app, const http::request<http::vector_body<std::uint8_t
             overwrite = (v != "f");
         }
 
-        std::scoped_lock lock(app.mtx);
+        const std::string src_key = make_key(parsed_src->op, parsed_src->name);
+        const std::string dst_key = make_key(parsed_dst->op, parsed_dst->name);
 
-        auto it_src = app.out_files.find(src_name);
-        if (it_src == app.out_files.end()) {
+        std::scoped_lock lock(app.mtx);
+        UserCache& uc = app.users[client_ip];
+
+        auto it_src = uc.out_files.find(src_key);
+        if (it_src == uc.out_files.end()) {
             return make_response(http::status::not_found, "Source not found\n");
         }
 
-        auto it_dst = app.out_files.find(dst_name);
-        if (it_dst != app.out_files.end() && !overwrite) {
+        auto it_dst = uc.out_files.find(dst_key);
+        if (it_dst != uc.out_files.end() && !overwrite) {
             return make_response(http::status::precondition_failed, "Destination exists and Overwrite: F\n");
         }
 
-        const bool existed = (it_dst != app.out_files.end());
-        if (existed) app.out_files.erase(it_dst);
+        const bool existed = (it_dst != uc.out_files.end());
+        if (existed) uc.out_files.erase(it_dst);
 
-        app.out_files[dst_name] = std::move(it_src->second);
-        app.out_files.erase(it_src);
+        uc.out_files[dst_key] = std::move(it_src->second);
+        uc.out_files.erase(it_src);
 
         return make_response(existed ? http::status::no_content : http::status::created, "");
     }
@@ -630,12 +721,12 @@ handle_request(AppState& app, const http::request<http::vector_body<std::uint8_t
     return make_response(http::status::method_not_allowed, "Method not supported yet\n");
 }
 
-static void do_session(tcp::socket socket, AppState& app) {
+static void do_session(tcp::socket socket, AppState& app, std::string client_ip) {
     beast::error_code ec;
     beast::flat_buffer buffer;
 
     int requests_handled = 0;
-    constexpr int MAX_REQS_PER_CONN = 32;
+    constexpr int MAX_REQS_PER_CONN = 64;
 
     for (;;) {
         http::request<http::vector_body<std::uint8_t>> req;
@@ -645,11 +736,9 @@ static void do_session(tcp::socket socket, AppState& app) {
         if (ec == http::error::end_of_stream) break;
         if (ec) return;
 
-        auto res = handle_request(app, req);
+        auto res = handle_request(app, client_ip, req);
 
-        // keep-alive support matters for Explorer probing
         res.keep_alive(req.keep_alive());
-
         http::write(socket, res, ec);
         if (ec) return;
 
@@ -673,32 +762,48 @@ void run_server(const std::string& bind_ip, unsigned short port) {
     std::jthread gc([&app](std::stop_token st) {
         using namespace std::chrono_literals;
         constexpr auto TTL = 10min;
+
         while (!st.stop_requested()) {
             std::this_thread::sleep_for(30s);
             std::scoped_lock lock(app.mtx);
             auto now = std::chrono::steady_clock::now();
 
-            for (auto it = app.in_files.begin(); it != app.in_files.end();) {
-                if (now - it->second.created_steady > TTL) it = app.in_files.erase(it);
-                else ++it;
-            }
+            for (auto user_it = app.users.begin(); user_it != app.users.end(); ) {
+                auto& uc = user_it->second;
 
-            for (auto it = app.out_files.begin(); it != app.out_files.end();) {
-                if (now - it->second.created_steady > TTL) it = app.out_files.erase(it);
-                else ++it;
+                for (auto it = uc.in_files.begin(); it != uc.in_files.end(); ) {
+                    if (now - it->second.created_steady > TTL) it = uc.in_files.erase(it);
+                    else ++it;
+                }
+
+                for (auto it = uc.out_files.begin(); it != uc.out_files.end(); ) {
+                    if (now - it->second.created_steady > TTL) it = uc.out_files.erase(it);
+                    else ++it;
+                }
+
+                // Drop empty user caches too
+                if (uc.in_files.empty() && uc.out_files.empty()) user_it = app.users.erase(user_it);
+                else ++user_it;
             }
         }
     });
 
     std::cout << "Listening on http://" << address.to_string() << ":" << port << "\n";
-    std::cout << "WebDAV base: /convert/png-jpg/\n";
+    std::cout << "WebDAV base examples:\n";
+    for (auto op : kConverters) {
+        std::cout << "  /convert/" << op << "/\n";
+    }
 
     for (;;) {
         tcp::socket socket{ioc};
         acceptor.accept(socket);
 
-        std::thread([s = std::move(socket), &app]() mutable {
-            do_session(std::move(s), app);
+        beast::error_code ec;
+        auto ep = socket.remote_endpoint(ec);
+        std::string client_ip = ec ? std::string("unknown") : ep.address().to_string();
+
+        std::thread([s = std::move(socket), &app, client_ip = std::move(client_ip)]() mutable {
+            do_session(std::move(s), app, std::move(client_ip));
         }).detach();
     }
 }

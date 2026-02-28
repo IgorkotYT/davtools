@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = -DMAGICKCORE_HDRI_ENABLE=1 -DMAGICKCORE_QUANTUM_DEPTH=16
 
-CXX_INCLUDES = -I/usr/include/ImageMagick-7 -I/home/aridlin/dev/cli/davtools/c++/src
+CXX_INCLUDES = -I/home/aridlin/dev/cli/davtools/c++/src -isystem /usr/include/ImageMagick-7
 
-CXX_FLAGS = -std=c++20 -Wall -Wextra -Wpedantic
+CXX_FLAGS = -std=c++20 -Wall -Wextra -Wpedantic -fopenmp -DMAGICKCORE_HDRI_ENABLE=1 -DMAGICKCORE_QUANTUM_DEPTH=16 -DMAGICKCORE_CHANNEL_MASK_DEPTH=32
 

@@ -4,11 +4,17 @@ convertdav: \
   /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/crtbeginS.o \
   CMakeFiles/convertdav.dir/src/main.cpp.o \
   CMakeFiles/convertdav.dir/src/server.cpp.o \
-  CMakeFiles/convertdav.dir/src/converters.cpp.o \
+  CMakeFiles/convertdav.dir/src/converters/registry.cpp.o \
+  CMakeFiles/convertdav.dir/src/converters/png_jpg.cpp.o \
+  CMakeFiles/convertdav.dir/src/converters/invert.cpp.o \
+  CMakeFiles/convertdav.dir/src/converters/img_gif.cpp.o \
+  CMakeFiles/convertdav.dir/src/converters/pdf_png.cpp.o \
   /usr/lib/libssl.so \
   /usr/lib/libcrypto.so \
   /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/libpthread.a \
   /usr/lib/libMagick++-7.Q16HDRI.so \
+  /usr/lib/libMagickWand-7.Q16HDRI.so \
+  /usr/lib/libMagickCore-7.Q16HDRI.so \
   /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/libstdc++.so \
   /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/libm.so \
   /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/libm.so \
@@ -35,9 +41,6 @@ convertdav: \
   /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/libgcc.a \
   /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/crtendS.o \
   /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/crtn.o \
-  /usr/lib/libMagickWand-7.Q16HDRI.so.10 \
-  /usr/lib/libMagickCore-7.Q16HDRI.so.10 \
-  /usr/lib/ld-linux-x86-64.so.2 \
   /usr/lib32/libX11.so.6 \
   /usr/lib/libX11.so.6 \
   /usr/lib32/libgomp.so.1 \
@@ -59,6 +62,7 @@ convertdav: \
   /usr/lib32/libz.so.1 \
   /usr/lib/libz.so.1 \
   /usr/lib/libltdl.so.7 \
+  /usr/lib/ld-linux-x86-64.so.2 \
   /usr/lib32/libxcb.so.1 \
   /usr/lib/libxcb.so.1 \
   /usr/lib32/libpng16.so.16 \
@@ -95,7 +99,15 @@ CMakeFiles/convertdav.dir/src/main.cpp.o:
 
 CMakeFiles/convertdav.dir/src/server.cpp.o:
 
-CMakeFiles/convertdav.dir/src/converters.cpp.o:
+CMakeFiles/convertdav.dir/src/converters/registry.cpp.o:
+
+CMakeFiles/convertdav.dir/src/converters/png_jpg.cpp.o:
+
+CMakeFiles/convertdav.dir/src/converters/invert.cpp.o:
+
+CMakeFiles/convertdav.dir/src/converters/img_gif.cpp.o:
+
+CMakeFiles/convertdav.dir/src/converters/pdf_png.cpp.o:
 
 /usr/lib/libssl.so:
 
@@ -104,6 +116,10 @@ CMakeFiles/convertdav.dir/src/converters.cpp.o:
 /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/libpthread.a:
 
 /usr/lib/libMagick++-7.Q16HDRI.so:
+
+/usr/lib/libMagickWand-7.Q16HDRI.so:
+
+/usr/lib/libMagickCore-7.Q16HDRI.so:
 
 /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/libstdc++.so:
 
@@ -157,12 +173,6 @@ CMakeFiles/convertdav.dir/src/converters.cpp.o:
 
 /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/crtn.o:
 
-/usr/lib/libMagickWand-7.Q16HDRI.so.10:
-
-/usr/lib/libMagickCore-7.Q16HDRI.so.10:
-
-/usr/lib/ld-linux-x86-64.so.2:
-
 /usr/lib32/libX11.so.6:
 
 /usr/lib/libX11.so.6:
@@ -204,6 +214,8 @@ CMakeFiles/convertdav.dir/src/converters.cpp.o:
 /usr/lib/libz.so.1:
 
 /usr/lib/libltdl.so.7:
+
+/usr/lib/ld-linux-x86-64.so.2:
 
 /usr/lib32/libxcb.so.1:
 
