@@ -1,0 +1,15 @@
+build/
+*.png
+*.jpg
+*.gif
+*.log
+*.exe
+*.o
+*.d
+*.tar.gz
+server_test.log
+clean.txt
+tiny.png
+tiny.jpg
+README.png
+virus.png

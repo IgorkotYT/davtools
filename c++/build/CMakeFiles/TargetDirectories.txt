@@ -1,3 +1,0 @@
-/home/aridlin/dev/cli/davtools/c++/build/CMakeFiles/convertdav.dir
-/home/aridlin/dev/cli/davtools/c++/build/CMakeFiles/edit_cache.dir
-/home/aridlin/dev/cli/davtools/c++/build/CMakeFiles/rebuild_cache.dir

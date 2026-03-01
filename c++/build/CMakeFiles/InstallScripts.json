@@ -1,7 +1,0 @@
-{
-	"InstallScripts" : 
-	[
-		"/home/aridlin/dev/cli/davtools/c++/build/cmake_install.cmake"
-	],
-	"Parallel" : false
-}
