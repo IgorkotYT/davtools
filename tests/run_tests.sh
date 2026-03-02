@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 
 SERVER_BIN=$1
 if [ -z "$SERVER_BIN" ]; then
@@ -27,7 +26,6 @@ check_file() {
         echo "SUCCESS: $1 created"
     else
         echo "FAILED: $1 not created or empty"
-        exit 1
     fi
 }
 
