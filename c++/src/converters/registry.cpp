@@ -17,6 +17,7 @@ std::vector<OutputArtifact> convert_pdf_png(const std::string&, const std::vecto
 std::vector<OutputArtifact> convert_mp4_gif(const std::string&, const std::vector<std::uint8_t>&);
 std::vector<OutputArtifact> convert_virustest(const std::string&, const std::vector<std::uint8_t>&);
 std::vector<OutputArtifact> convert_sha256(const std::string&, const std::vector<std::uint8_t>&);
+std::vector<OutputArtifact> convert_base64(const std::string&, const std::vector<std::uint8_t>&);
 
 namespace {
 
@@ -110,6 +111,7 @@ void init_registry_once_locked() {
     g_registry.emplace("mp4-gif", Entry{convert_mp4_gif, true, {}});
     g_registry.emplace("virustest", Entry{convert_virustest, true, {}});
     g_registry.emplace("sha256", Entry{convert_sha256, true, {}});
+    g_registry.emplace("base64", Entry{convert_base64, true, {}});
 
     // optional aliases
     g_registry.emplace("img_gif", Entry{convert_img_gif, true, {}});
@@ -161,6 +163,13 @@ void test_one(const std::string& op, bool disable_broken) {
             if (out[0].data.find("ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad") != 0) {
                 throw std::runtime_error("sha256 hash mismatch");
             }
+        } else if (op == "base64") {
+            auto out = g_registry.at(op).fn("selftest.txt", {'h', 'e', 'l', 'l', 'o', ' ', 'w', 'o', 'r', 'l', 'd'});
+            if (out.empty() || out[0].data.empty()) throw std::runtime_error("empty output");
+            // base64("hello world") = aGVsbG8gd29ybGQ=
+            if (out[0].data.find("aGVsbG8gd29ybGQ=") != 0) {
+                throw std::runtime_error("base64 mismatch");
+            }
         }
     } catch (const std::exception& e) {
         if (disable_broken) {
@@ -170,7 +179,7 @@ void test_one(const std::string& op, bool disable_broken) {
 }
 
 std::vector<std::string> canonical_ops_for_testing() {
-    return {"png-jpg", "invert", "img-gif", "pdf-png", "mp4-gif", "virustest", "sha256"};
+    return {"png-jpg", "invert", "img-gif", "pdf-png", "mp4-gif", "virustest", "sha256", "base64"};
 }
 
 } // namespace

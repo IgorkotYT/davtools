@@ -1,3 +1,7 @@
 ## 2024-05-18 - SHA256 checksum generator using OpenSSL EVP
 **Learning:** Reusing existing OpenSSL dependencies (`OpenSSL::Crypto`) using `EVP_MD_CTX` API is far superior compared to raw legacy functions like `SHA256_Init`/`SHA256_Update`/`SHA256_Final` since the legacy functions have been deprecated in OpenSSL 3.0. The EVP API is robust, requires careful memory management (`EVP_MD_CTX_new` and `EVP_MD_CTX_free`), and cleanly integrates with our existing `std::vector<uint8_t>` pipeline without adding large new dependencies.
 **Action:** Always prefer the `EVP` API when handling checksums and cryptographic hashes using OpenSSL to ensure compatibility with modern OpenSSL versions (3.0+) and explicitly handle context allocation and deallocation to prevent memory leaks in long-running services like convertdav.
+
+## 2024-05-19 - OpenSSL EVP_EncodeBlock memory and length handling
+**Learning:** `EVP_EncodeBlock` requires the output buffer to be larger than strictly the encoded text. It needs space for `4 * ((input.size() + 2) / 3)` bytes PLUS a trailing NUL terminator, which it adds silently. Additionally, `EVP_EncodeBlock` encodes purely in base64 without inserting newline characters, unlike `EVP_EncodeUpdate` which formats with line breaks.
+**Action:** When implementing base64 encoders via OpenSSL, strictly allocate `length + 1` for the buffer. Manually append `\n` if formatting line breaks are required, and resize the buffer back down using the actual return value of `EVP_EncodeBlock` (which does not count the NUL terminator).
