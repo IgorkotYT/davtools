@@ -13,7 +13,7 @@ SERVER_PID=$!
 cleanup() {
     echo "Cleaning up..."
     kill $SERVER_PID || true
-    rm -f clean.txt clean.png tiny.png tiny.jpg invert.png img.gif test.pdf pdf.png test.mp4 mp4.gif server_test.log
+    rm -f clean.txt clean.png tiny.png tiny.jpg invert.png img.gif test.pdf pdf.png test.mp4 mp4.gif b64_in.txt b64_out.txt server_test.log
 }
 trap cleanup EXIT
 
@@ -72,6 +72,18 @@ if command -v ffmpeg > /dev/null; then
     check_file mp4.gif
 else
     echo "Skipping mp4-gif (ffmpeg not found)"
+fi
+
+echo "Testing base64..."
+echo -n "hello world" > b64_in.txt
+curl -s -T b64_in.txt http://127.0.0.1:8081/convert/base64/in/b64_in.txt
+curl -s http://127.0.0.1:8081/convert/base64/out/b64_in.txt.b64.txt --output b64_out.txt
+check_file b64_out.txt
+if grep -q "aGVsbG8gd29ybGQ=" b64_out.txt; then
+    echo "SUCCESS: base64 output is correct"
+else
+    echo "FAILED: base64 output is incorrect"
+    cat b64_out.txt
 fi
 
 echo "All tests passed!"
