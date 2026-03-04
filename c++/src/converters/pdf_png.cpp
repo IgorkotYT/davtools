@@ -1,46 +1,65 @@
-#include "common.hpp"
+#include "../app.hpp"
 
-#include <filesystem>
+#include <Magick++.h>
+
+#include <iomanip>
+#include <list>
+#include <sstream>
+#include <stdexcept>
+#include <string>
 #include <vector>
 
-namespace fs = std::filesystem;
+static std::string stem_of(const std::string& name) {
+    auto slash = name.find_last_of("/\\");
+    std::string base = (slash == std::string::npos) ? name : name.substr(slash + 1);
+    auto dot = base.find_last_of('.');
+    if (dot == std::string::npos) return base;
+    return base.substr(0, dot);
+}
+
+static std::string blob_to_string(const Magick::Blob& b) {
+    return std::string(static_cast<const char*>(b.data()), b.length());
+}
 
 std::vector<OutputArtifact> convert_pdf_png(
     const std::string& input_name,
     const std::vector<std::uint8_t>& input)
 {
-    conv::TempDir tmp("conv-pdf-png-");
-
-    std::string in_file = input_name.empty() ? "input.pdf" : input_name;
-    if (conv::lower_ext(in_file) != "pdf") in_file = conv::basename_no_ext(in_file) + ".pdf";
-
-    const fs::path in_path = tmp.path() / in_file;
-    const std::string base = conv::basename_no_ext(in_file);
-
-    conv::write_file_bytes(in_path, input);
-
-    // %03d => multiple output files, one per page
-    const fs::path pattern = tmp.path() / (base + "_page_%03d.png");
-
-    std::vector<std::string> real;
-    if (conv::program_exists("magick")) {
-        real = {"magick", "-density", "150", in_path.string(), pattern.string()};
-    } else {
-        real = {"convert", "-density", "150", in_path.string(), pattern.string()};
+    if (input.empty()) {
+        throw std::runtime_error("empty input");
     }
 
-    auto r = conv::run_process(real);
-    conv::require_success(r, real[0]);
+    Magick::Blob in_blob(input.data(), input.size());
+
+    // Multi-page PDF decode (requires Ghostscript + ImageMagick PDF policy enabled)
+    std::list<Magick::Image> pages;
+    Magick::readImages(&pages, in_blob);
+
+    if (pages.empty()) {
+        throw std::runtime_error("no pages decoded from PDF");
+    }
 
     std::vector<OutputArtifact> out;
-    for (const auto& p : conv::list_files_sorted(tmp.path())) {
-        if (!p.has_extension() || conv::lower_ext(p.filename().string()) != "png") continue;
-        if (p.filename().string().find(base + "_page_") != 0) continue;
-        out.push_back(conv::make_artifact_from_file(p));
-    }
+    const std::string stem = stem_of(input_name);
 
-    if (out.empty()) {
-        throw std::runtime_error("pdf-png produced no PNG files (Ghostscript/ImageMagick policy?)");
+    int page_index = 1;
+    for (auto& page : pages) {
+        page.magick("PNG");
+        page.strip();
+
+        Magick::Blob out_blob;
+        page.write(&out_blob);
+
+        std::ostringstream name;
+        name << stem << "_page_"
+             << std::setw(4) << std::setfill('0') << page_index++
+             << ".png";
+
+        out.push_back(OutputArtifact{
+            .name = name.str(),
+            .content_type = "image/png",
+            .data = blob_to_string(out_blob)
+        });
     }
 
     return out;
