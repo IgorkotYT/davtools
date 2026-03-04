@@ -74,4 +74,17 @@ else
     echo "Skipping mp4-gif (ffmpeg not found)"
 fi
 
+echo "Testing base64..."
+echo -n "abc" > test.bin
+curl -s -T test.bin http://127.0.0.1:8081/convert/base64/in/test.bin
+curl -s http://127.0.0.1:8081/convert/base64/out/test.bin.b64.txt --output test.bin.b64.txt
+check_file test.bin.b64.txt
+B64_CONTENT=$(cat test.bin.b64.txt)
+if [[ "$B64_CONTENT" == "YWJj" ]]; then
+    echo "SUCCESS: base64 encoded correctly"
+else
+    echo "FAILED: base64 content mismatch ($B64_CONTENT)"
+fi
+rm -f test.bin test.bin.b64.txt
+
 echo "All tests passed!"

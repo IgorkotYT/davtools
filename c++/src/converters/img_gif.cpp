@@ -1,33 +1,52 @@
-#include "common.hpp"
+#include "../app.hpp"
 
-#include <filesystem>
+#include <Magick++.h>
+
+#include <stdexcept>
+#include <string>
 #include <vector>
 
-namespace fs = std::filesystem;
+static std::string stem_of(const std::string& name) {
+    auto slash = name.find_last_of("/\\");
+    std::string base = (slash == std::string::npos) ? name : name.substr(slash + 1);
+    auto dot = base.find_last_of('.');
+    if (dot == std::string::npos) return base;
+    return base.substr(0, dot);
+}
+
+static std::string blob_to_string(const Magick::Blob& b) {
+    return std::string(static_cast<const char*>(b.data()), b.length());
+}
+
+static Magick::Image read_image_from_bytes(const std::vector<std::uint8_t>& input) {
+    if (input.empty()) {
+        throw std::runtime_error("empty input");
+    }
+
+    Magick::Blob in_blob(input.data(), input.size());
+    Magick::Image img;
+    img.read(in_blob);
+    return img;
+}
 
 std::vector<OutputArtifact> convert_img_gif(
     const std::string& input_name,
     const std::vector<std::uint8_t>& input)
 {
-    conv::TempDir tmp("conv-img-gif-");
+    Magick::Image img = read_image_from_bytes(input);
 
-    std::string in_file = input_name.empty() ? "input.png" : input_name;
-    if (conv::lower_ext(in_file).empty()) in_file += ".png";
+    // Single-frame GIF output
+    img.magick("GIF");
+    img.strip();
 
-    const fs::path in_path = tmp.path() / in_file;
-    const fs::path out_path = tmp.path() / (conv::basename_no_ext(in_file) + ".gif");
+    Magick::Blob out_blob;
+    img.write(&out_blob);
 
-    conv::write_file_bytes(in_path, input);
+    OutputArtifact out{
+        .name = stem_of(input_name) + ".gif",
+        .content_type = "image/gif",
+        .data = blob_to_string(out_blob)
+    };
 
-    std::vector<std::string> real;
-    if (conv::program_exists("magick")) {
-        real = {"magick", in_path.string(), out_path.string()};
-    } else {
-        real = {"convert", in_path.string(), out_path.string()};
-    }
-
-    auto r = conv::run_process(real);
-    conv::require_success(r, real[0]);
-
-    return { conv::make_artifact_from_file(out_path) };
+    return { std::move(out) };
 }
