@@ -75,3 +75,15 @@ else
 fi
 
 echo "All tests passed!"
+
+echo "Testing base64..."
+echo -n "test" > test_b64.txt
+curl -s -T test_b64.txt http://127.0.0.1:8081/convert/base64/in/test_b64.txt
+curl -s http://127.0.0.1:8081/convert/base64/out/test_b64.txt.b64.txt --output test_out.b64.txt
+check_file test_out.b64.txt
+if grep -q "dGVzdA==" test_out.b64.txt; then
+    echo "SUCCESS: base64 output matches"
+else
+    echo "FAILED: base64 output mismatch"
+fi
+rm -f test_b64.txt test_out.b64.txt
