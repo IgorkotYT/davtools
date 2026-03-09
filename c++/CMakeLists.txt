@@ -21,6 +21,7 @@ add_executable(convertdav
     src/converters/mp4_gif.cpp
     src/converters/virustest.cpp
     src/converters/sha256.cpp
+    src/converters/base64.cpp
 )
 
 target_include_directories(convertdav PRIVATE
