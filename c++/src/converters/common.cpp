@@ -250,4 +250,25 @@ std::vector<std::string> magick_args(const std::vector<std::string>& subargs) {
     return subargs; // "convert" mode expects direct args
 }
 
+std::string sanitize_filename(std::string_view name) {
+    if (name.empty()) return "input.bin";
+
+    std::string s(name);
+    // Replace all backslashes with forward slashes for cross-platform consistency
+    std::replace(s.begin(), s.end(), '\\', '/');
+
+    fs::path p(s);
+    std::string filename = p.filename().string();
+
+    if (filename == "." || filename == "..") {
+        return "input.bin";
+    }
+
+    if (filename.empty()) {
+        return "input.bin";
+    }
+
+    return filename;
+}
+
 } // namespace conv
