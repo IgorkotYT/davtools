@@ -29,6 +29,19 @@ check_file() {
     fi
 }
 
+echo "Testing json-min..."
+echo '{"a": 1, "b": [1, 2, 3]}' > test.json
+curl -s -T test.json http://127.0.0.1:8081/convert/json-min/in/test.json
+curl -s http://127.0.0.1:8081/convert/json-min/out/test.min.json --output test.min.json
+check_file test.min.json
+OUTPUT=$(cat test.min.json)
+if [ "$OUTPUT" = '{"a":1,"b":[1,2,3]}' ]; then
+    echo "SUCCESS: json-min output matches expected"
+else
+    echo "FAILED: json-min output mismatch, got: $OUTPUT"
+fi
+rm -f test.json test.min.json
+
 echo "Testing root endpoint..."
 curl -s http://127.0.0.1:8081/ | grep "convertdav"
 

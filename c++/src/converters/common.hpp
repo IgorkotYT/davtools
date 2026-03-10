@@ -58,4 +58,6 @@ void require_success(const CommandResult& r, std::string_view tool_name);
 
 std::vector<std::string> magick_args(const std::vector<std::string>& subargs);
 
+std::string sanitize_filename(std::string_view name);
+
 } // namespace conv
