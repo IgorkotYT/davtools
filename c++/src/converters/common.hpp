@@ -51,6 +51,8 @@ std::string replace_extension(std::string name, std::string_view new_ext_no_dot)
 std::string basename_no_ext(std::string_view name);
 std::string lower_ext(std::string_view name);
 
+std::string sanitize_filename(std::string_view name);
+
 std::vector<std::filesystem::path> list_files_sorted(const std::filesystem::path& dir);
 
 OutputArtifact make_artifact_from_file(const std::filesystem::path& p, std::string logical_name = {});

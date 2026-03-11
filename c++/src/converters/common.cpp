@@ -208,6 +208,21 @@ std::string lower_ext(std::string_view name) {
     return ext;
 }
 
+} // namespace conv
+
+std::string conv::sanitize_filename(std::string_view name) {
+    std::string s(name);
+    std::replace(s.begin(), s.end(), '\\', '/');
+    fs::path p(s);
+    std::string filename = p.filename().string();
+    if (filename == "." || filename == "..") {
+        return "";
+    }
+    return filename;
+}
+
+namespace conv {
+
 std::vector<fs::path> list_files_sorted(const fs::path& dir) {
     std::vector<fs::path> out;
     for (const auto& e : fs::directory_iterator(dir)) {
