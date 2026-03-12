@@ -38,6 +38,19 @@ curl -s -T base64.txt http://127.0.0.1:8081/convert/base64/in/base64.txt
 curl -s http://127.0.0.1:8081/convert/base64/out/base64.txt.b64.txt --output base64.txt.b64.txt
 check_file base64.txt.b64.txt
 
+echo "Testing md5..."
+echo "abc" > md5.txt
+curl -s -T md5.txt http://127.0.0.1:8081/convert/md5/in/md5.txt
+curl -s http://127.0.0.1:8081/convert/md5/out/md5.txt.md5.txt --output md5_result.txt
+check_file md5_result.txt
+# Verify the MD5 of "abc\n" (note: echo adds newline, so we expect MD5 of "abc\n" which is 0bee89b07a248e27c83fc3d5951213c1)
+if ! grep -q "0bee89b07a248e27c83fc3d5951213c1" md5_result.txt; then
+    echo "FAILED: MD5 hash mismatch"
+    cat md5_result.txt
+else
+    echo "SUCCESS: MD5 hash correct"
+fi
+
 echo "Testing virustest..."
 echo "This is a clean test file" > clean.txt
 curl -s -T clean.txt http://127.0.0.1:8081/convert/virustest/in/clean.txt
