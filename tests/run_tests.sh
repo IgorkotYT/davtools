@@ -80,4 +80,10 @@ else
     echo "Skipping mp4-gif (ffmpeg not found)"
 fi
 
+echo "Testing json-min..."
+echo "{\"a\": 1, \"b\" :   [1, 2,  3] }" > test.json
+curl -s -T test.json http://127.0.0.1:8081/convert/json-min/in/test.json
+curl -s http://127.0.0.1:8081/convert/json-min/out/test.min.json --output test.min.json
+check_file test.min.json
+
 echo "All tests passed!"
