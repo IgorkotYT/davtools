@@ -13,7 +13,7 @@ SERVER_PID=$!
 cleanup() {
     echo "Cleaning up..."
     kill $SERVER_PID || true
-    rm -f clean.txt clean.png tiny.png tiny.jpg invert.png img.gif test.pdf pdf.png test.mp4 mp4.gif base64.txt base64.txt.b64.txt server_test.log
+    rm -f clean.txt clean.png tiny.png tiny.jpg invert.png img.gif test.pdf pdf.png test.mp4 mp4.gif base64.txt base64.txt.b64.txt test.json test.min.json empty.json empty.min.json server_test.log
 }
 trap cleanup EXIT
 
@@ -37,6 +37,20 @@ echo "abc" > base64.txt
 curl -s -T base64.txt http://127.0.0.1:8081/convert/base64/in/base64.txt
 curl -s http://127.0.0.1:8081/convert/base64/out/base64.txt.b64.txt --output base64.txt.b64.txt
 check_file base64.txt.b64.txt
+
+echo "Testing json-minify..."
+echo '{
+  "test": " a b c "
+}' > test.json
+curl -s -T test.json http://127.0.0.1:8081/convert/json-minify/in/test.json
+curl -s http://127.0.0.1:8081/convert/json-minify/out/test.min.json --output test.min.json
+check_file test.min.json
+
+# Check empty json
+touch empty.json
+curl -s -T empty.json http://127.0.0.1:8081/convert/json-minify/in/empty.json
+curl -s http://127.0.0.1:8081/convert/json-minify/out/empty.min.json --output empty.min.json
+check_file empty.min.json
 
 echo "Testing virustest..."
 echo "This is a clean test file" > clean.txt
