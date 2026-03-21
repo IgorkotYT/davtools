@@ -18,6 +18,7 @@ std::vector<OutputArtifact> convert_mp4_gif(const std::string&, const std::vecto
 std::vector<OutputArtifact> convert_virustest(const std::string&, const std::vector<std::uint8_t>&);
 std::vector<OutputArtifact> convert_sha256(const std::string&, const std::vector<std::uint8_t>&);
 std::vector<OutputArtifact> convert_base64(const std::string&, const std::vector<std::uint8_t>&);
+std::vector<OutputArtifact> convert_json_minify(const std::string&, const std::vector<std::uint8_t>&);
 
 namespace {
 
@@ -80,6 +81,11 @@ std::vector<std::uint8_t> tiny_pdf() {
     return std::vector<std::uint8_t>(s, s + std::strlen(s));
 }
 
+static std::vector<std::uint8_t> tiny_json() {
+    const char* s = "{ \n  \"a\": 1, \n  \"b\": \" c \" \n}";
+    return {s, s + std::strlen(s)};
+}
+
 std::vector<std::uint8_t> tiny_mp4_generated() {
     if (!conv::program_exists("ffmpeg")) throw std::runtime_error("ffmpeg not found");
     conv::TempDir tmp("ffmpeg-selftest-");
@@ -112,6 +118,7 @@ void init_registry_once_locked() {
     g_registry.emplace("virustest", Entry{convert_virustest, true, {}});
     g_registry.emplace("sha256", Entry{convert_sha256, true, {}});
     g_registry.emplace("base64", Entry{convert_base64, true, {}});
+    g_registry.emplace("json-minify", Entry{convert_json_minify, true, {}});
 
     // optional aliases
     g_registry.emplace("img_gif", Entry{convert_img_gif, true, {}});
@@ -170,6 +177,12 @@ void test_one(const std::string& op, bool disable_broken) {
             if (out[0].data.find("YWJj\n") != 0) {
                 throw std::runtime_error("base64 hash mismatch");
             }
+        } else if (op == "json-minify") {
+            auto out = g_registry.at(op).fn("selftest.json", tiny_json());
+            if (out.empty() || out[0].data.empty()) throw std::runtime_error("empty output");
+            if (out[0].data != "{\"a\":1,\"b\":\" c \"}") {
+                throw std::runtime_error("json minify output mismatch");
+            }
         }
     } catch (const std::exception& e) {
         if (disable_broken) {
@@ -179,7 +192,7 @@ void test_one(const std::string& op, bool disable_broken) {
 }
 
 std::vector<std::string> canonical_ops_for_testing() {
-    return {"png-jpg", "invert", "img-gif", "pdf-png", "mp4-gif", "virustest", "sha256", "base64"};
+    return {"png-jpg", "invert", "img-gif", "pdf-png", "mp4-gif", "virustest", "sha256", "base64", "json-minify"};
 }
 
 } // namespace
