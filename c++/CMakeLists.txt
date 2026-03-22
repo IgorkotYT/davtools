@@ -20,6 +20,7 @@ add_executable(convertdav
     src/converters/pdf_png.cpp
     src/converters/mp4_gif.cpp
     src/converters/virustest.cpp
+    src/converters/md5.cpp
     src/converters/sha256.cpp
     src/converters/base64.cpp
 )

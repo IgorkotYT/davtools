@@ -13,7 +13,7 @@ SERVER_PID=$!
 cleanup() {
     echo "Cleaning up..."
     kill $SERVER_PID || true
-    rm -f clean.txt clean.png tiny.png tiny.jpg invert.png img.gif test.pdf pdf.png test.mp4 mp4.gif base64.txt base64.txt.b64.txt server_test.log
+    rm -f clean.txt clean.png tiny.png tiny.jpg invert.png img.gif test.pdf pdf.png test.mp4 mp4.gif md5.txt md5.txt.md5.txt base64.txt base64.txt.b64.txt server_test.log
 }
 trap cleanup EXIT
 
@@ -37,6 +37,12 @@ echo "abc" > base64.txt
 curl -s -T base64.txt http://127.0.0.1:8081/convert/base64/in/base64.txt
 curl -s http://127.0.0.1:8081/convert/base64/out/base64.txt.b64.txt --output base64.txt.b64.txt
 check_file base64.txt.b64.txt
+
+echo "Testing md5..."
+echo "abc" > md5.txt
+curl -s -T md5.txt http://127.0.0.1:8081/convert/md5/in/md5.txt
+curl -s http://127.0.0.1:8081/convert/md5/out/md5.txt.md5.txt --output md5.txt.md5.txt
+check_file md5.txt.md5.txt
 
 echo "Testing virustest..."
 echo "This is a clean test file" > clean.txt
