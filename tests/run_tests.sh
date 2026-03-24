@@ -13,7 +13,7 @@ SERVER_PID=$!
 cleanup() {
     echo "Cleaning up..."
     kill $SERVER_PID || true
-    rm -f clean.txt clean.png tiny.png tiny.jpg invert.png img.gif test.pdf pdf.png test.mp4 mp4.gif base64.txt base64.txt.b64.txt server_test.log
+    rm -f clean.txt clean.png tiny.png tiny.jpg invert.png img.gif test.pdf pdf.png test.mp4 mp4.gif base64.txt base64.txt.b64.txt test.json test.min.json server_test.log
 }
 trap cleanup EXIT
 
@@ -31,6 +31,18 @@ check_file() {
 
 echo "Testing root endpoint..."
 curl -s http://127.0.0.1:8081/ | grep "convertdav"
+
+echo "Testing json-minify..."
+echo '{"a": 1, "b": "hello \"world\""}' > test.json
+curl -s -T test.json http://127.0.0.1:8081/convert/json-minify/in/test.json
+curl -s http://127.0.0.1:8081/convert/json-minify/out/test.min.json --output test.min.json
+check_file test.min.json
+minified=$(cat test.min.json)
+if [ "$minified" != '{"a":1,"b":"hello \"world\""}' ]; then
+    echo "FAILED: json-minify content mismatch. Got: $minified"
+else
+    echo "SUCCESS: json-minify content matched"
+fi
 
 echo "Testing base64..."
 echo "abc" > base64.txt
