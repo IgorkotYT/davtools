@@ -22,6 +22,7 @@ add_executable(convertdav
     src/converters/virustest.cpp
     src/converters/sha256.cpp
     src/converters/base64.cpp
+    src/converters/json_minify.cpp
 )
 
 target_include_directories(convertdav PRIVATE
