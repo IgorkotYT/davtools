@@ -13,7 +13,7 @@ SERVER_PID=$!
 cleanup() {
     echo "Cleaning up..."
     kill $SERVER_PID || true
-    rm -f clean.txt clean.png tiny.png tiny.jpg invert.png img.gif test.pdf pdf.png test.mp4 mp4.gif base64.txt base64.txt.b64.txt server_test.log
+    rm -f clean.txt clean.png tiny.png tiny.jpg invert.png img.gif test.pdf pdf.png test.mp4 mp4.gif base64.txt base64.txt.b64.txt server_test.log test.json test.min.json
 }
 trap cleanup EXIT
 
@@ -68,6 +68,18 @@ curl -s -T test.pdf http://127.0.0.1:8081/convert/pdf-png/in/test.pdf
 # pdf-png might produce multiple pages, but it should at least produce page 0
 curl -s http://127.0.0.1:8081/convert/pdf-png/out/test.0.png --output pdf.png
 check_file pdf.png
+
+echo "Testing json-minify..."
+echo '{"key": "value", "arr": [1, 2, 3]}' > test.json
+curl -s -T test.json http://127.0.0.1:8081/convert/json-minify/in/test.json
+curl -s http://127.0.0.1:8081/convert/json-minify/out/test.min.json --output test.min.json
+check_file test.min.json
+if grep -q '"key":"value","arr":\[1,2,3\]' test.min.json; then
+    echo "SUCCESS: json-minify output is correct"
+else
+    echo "FAILED: json-minify output is incorrect"
+    cat test.min.json
+fi
 
 echo "Testing mp4-gif..."
 # ffmpeg can create a tiny mp4
