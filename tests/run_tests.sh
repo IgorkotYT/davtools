@@ -38,6 +38,12 @@ curl -s -T base64.txt http://127.0.0.1:8081/convert/base64/in/base64.txt
 curl -s http://127.0.0.1:8081/convert/base64/out/base64.txt.b64.txt --output base64.txt.b64.txt
 check_file base64.txt.b64.txt
 
+echo "Testing json-min..."
+echo '{"hello": "world"}' > test.json
+curl -s -T test.json http://127.0.0.1:8081/convert/json-min/in/test.json
+curl -s http://127.0.0.1:8081/convert/json-min/out/test.min.json --output test.min.json
+check_file test.min.json
+
 echo "Testing virustest..."
 echo "This is a clean test file" > clean.txt
 curl -s -T clean.txt http://127.0.0.1:8081/convert/virustest/in/clean.txt
