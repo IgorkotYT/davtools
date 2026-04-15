@@ -13,7 +13,7 @@ SERVER_PID=$!
 cleanup() {
     echo "Cleaning up..."
     kill $SERVER_PID || true
-    rm -f clean.txt clean.png tiny.png tiny.jpg invert.png img.gif test.pdf pdf.png test.mp4 mp4.gif base64.txt base64.txt.b64.txt server_test.log
+    rm -f clean.txt clean.png tiny.png tiny.jpg invert.png img.gif test.pdf pdf.png test.mp4 mp4.gif base64.txt base64.txt.b64.txt raw.json raw.min.json server_test.log
 }
 trap cleanup EXIT
 
@@ -31,6 +31,13 @@ check_file() {
 
 echo "Testing root endpoint..."
 curl -s http://127.0.0.1:8081/ | grep "convertdav"
+
+echo "Testing json-min..."
+echo "{ \"hello\": \"world\" }" > raw.json
+curl -s -T raw.json http://127.0.0.1:8081/convert/json-min/in/raw.json
+curl -s http://127.0.0.1:8081/convert/json-min/out/raw.min.json --output raw.min.json
+check_file raw.min.json
+grep -Fq '{"hello":"world"}' raw.min.json || { echo "json-min content mismatch"; exit 1; }
 
 echo "Testing base64..."
 echo "abc" > base64.txt
