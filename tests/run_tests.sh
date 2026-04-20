@@ -13,7 +13,7 @@ SERVER_PID=$!
 cleanup() {
     echo "Cleaning up..."
     kill $SERVER_PID || true
-    rm -f clean.txt clean.png tiny.png tiny.jpg invert.png img.gif test.pdf pdf.png test.mp4 mp4.gif base64.txt base64.txt.b64.txt server_test.log
+    rm -f clean.txt clean.png tiny.png tiny.jpg invert.png img.gif test.pdf pdf.png test.mp4 mp4.gif base64.txt base64.txt.b64.txt test.json test.min.json server_test.log
 }
 trap cleanup EXIT
 
@@ -79,5 +79,12 @@ if command -v ffmpeg > /dev/null; then
 else
     echo "Skipping mp4-gif (ffmpeg not found)"
 fi
+
+echo "Testing json-minify..."
+printf '{\n  "hello": "world",\n  "test": 123\n}' > test.json
+curl -s -T test.json http://127.0.0.1:8081/convert/json-minify/in/test.json
+curl -s http://127.0.0.1:8081/convert/json-minify/out/test.min.json --output test.min.json
+check_file test.min.json
+grep -Fq '{"hello":"world","test":123}' test.min.json && echo "SUCCESS: json-minify output is correct" || echo "FAILED: json-minify output is incorrect"
 
 echo "All tests passed!"
