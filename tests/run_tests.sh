@@ -13,7 +13,7 @@ SERVER_PID=$!
 cleanup() {
     echo "Cleaning up..."
     kill $SERVER_PID || true
-    rm -f clean.txt clean.png tiny.png tiny.jpg invert.png img.gif test.pdf pdf.png test.mp4 mp4.gif base64.txt base64.txt.b64.txt server_test.log
+    rm -f clean.txt clean.png tiny.png tiny.jpg invert.png img.gif test.pdf pdf.png test.mp4 mp4.gif base64.txt base64.txt.b64.txt test.json test.min.json empty.json empty.min.json server_test.log
 }
 trap cleanup EXIT
 
@@ -79,5 +79,16 @@ if command -v ffmpeg > /dev/null; then
 else
     echo "Skipping mp4-gif (ffmpeg not found)"
 fi
+
+echo "Testing json-min..."
+printf '{\n  "a": "b \\" c",\n  "d": [1, 2, 3]\n}' > test.json
+curl -s -T test.json http://127.0.0.1:8081/convert/json-min/in/test.json
+curl -s http://127.0.0.1:8081/convert/json-min/out/test.min.json --output test.min.json
+check_file test.min.json
+
+echo -n " " > empty.json
+curl -s -T empty.json http://127.0.0.1:8081/convert/json-min/in/empty.json
+curl -s http://127.0.0.1:8081/convert/json-min/out/empty.min.json --output empty.min.json
+check_file empty.min.json
 
 echo "All tests passed!"
